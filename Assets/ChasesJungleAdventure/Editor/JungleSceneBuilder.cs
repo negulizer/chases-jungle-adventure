@@ -126,6 +126,9 @@ public static class JungleSceneBuilder
         var boardPanel   = MakePanel(canvasGO, "GameBoardPanel",   PanelJungleTint);
         var winPanel     = MakePanel(canvasGO, "WinPanel",         new Color(0.85f, 0.65f, 0.05f));
 
+        DecorateMenuPanel(welcomePanel, new Color(0.08f, 0.34f, 0.14f, 0.92f), new Color(0.95f, 0.84f, 0.44f, 0.18f));
+        DecorateMenuPanel(setupPanel,   new Color(0.06f, 0.24f, 0.40f, 0.92f), new Color(0.60f, 0.88f, 1.00f, 0.16f));
+        DecorateMenuPanel(winPanel,     new Color(0.70f, 0.48f, 0.05f, 0.92f), new Color(1.00f, 0.94f, 0.70f, 0.20f));
         DecorateBoardBackground(boardPanel);
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -135,6 +138,7 @@ public static class JungleSceneBuilder
             "Chase's Jungle Adventure!", 72f, Color.white);
         Anchor(titleTMP.gameObject, new Vector2(0.05f, 0.62f), new Vector2(0.95f, 0.88f));
         titleTMP.fontStyle = FontStyles.Bold;
+        titleTMP.characterSpacing = 5f;
 
         var newGameBtn  = MakeButton(welcomePanel, "NewGameButton",  "New Game");
         CenterAt(newGameBtn.gameObject, new Vector2(0,  -30), new Vector2(420, 90));
@@ -149,9 +153,11 @@ public static class JungleSceneBuilder
         var setupTitleTMP = MakeTMP(setupPanel, "SetupTitle", "Who's Playing?", 64f, Color.white);
         Anchor(setupTitleTMP.gameObject, new Vector2(0.1f, 0.72f), new Vector2(0.9f, 0.90f));
         setupTitleTMP.fontStyle = FontStyles.Bold;
+        setupTitleTMP.characterSpacing = 3f;
 
         var playerCountTMP = MakeTMP(setupPanel, "PlayerCountText", "Players: 1", 48f, Color.yellow);
         Anchor(playerCountTMP.gameObject, new Vector2(0.1f, 0.58f), new Vector2(0.9f, 0.72f));
+        playerCountTMP.fontStyle = FontStyles.Bold;
 
         var addPlayerBtn = MakeButton(setupPanel, "AddPlayerButton",  "Add Player");
         CenterAt(addPlayerBtn.gameObject, new Vector2(0, -30), new Vector2(420, 90));
@@ -168,23 +174,35 @@ public static class JungleSceneBuilder
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
         // HUD — two text lines anchored to the top strip
+        var hudTopPlate = MakeRoundedPlate(boardPanel, "HudTopPlate", new Vector2(0.5f, 0.905f), new Vector2(1220f, 150f), new Color(0.06f, 0.18f, 0.08f, 0.70f), 0f);
+        hudTopPlate.transform.SetAsLastSibling();
+
         var playerTurnTMP = MakeTMP(boardPanel, "PlayerTurnText", "Player 1's turn!", 50f, Color.white);
         Anchor(playerTurnTMP.gameObject, new Vector2(0.03f, 0.90f), new Vector2(0.97f, 0.99f));
+        playerTurnTMP.fontStyle = FontStyles.Bold;
+        playerTurnTMP.characterSpacing = 2f;
 
         var cardDrawnTMP = MakeTMP(boardPanel, "CardDrawnText", "", 40f, Color.yellow);
         Anchor(cardDrawnTMP.gameObject, new Vector2(0.03f, 0.82f), new Vector2(0.97f, 0.90f));
+        cardDrawnTMP.fontStyle = FontStyles.Bold;
 
         // Big counting number — center overlay, hidden except during movement
+        var countingPlate = MakeRoundedPlate(boardPanel, "CountingPlate", new Vector2(0.5f, 0.50f), new Vector2(340f, 260f), new Color(0.05f, 0.11f, 0.06f, 0.68f), -4f);
+        countingPlate.SetActive(false);
         var countingTMP = MakeTMP(boardPanel, "CountingText", "", 130f, Color.white);
         Anchor(countingTMP.gameObject, new Vector2(0.35f, 0.38f), new Vector2(0.65f, 0.62f));
         countingTMP.fontStyle = FontStyles.Bold;
         countingTMP.gameObject.SetActive(false);
+        countingTMP.characterSpacing = 10f;
 
         // Special-space message — center overlay, hidden until triggered
+        var specialPlate = MakeRoundedPlate(boardPanel, "SpecialPlate", new Vector2(0.5f, 0.50f), new Vector2(1180f, 180f), new Color(0.16f, 0.09f, 0.02f, 0.78f), 0f);
+        specialPlate.SetActive(false);
         var specialMsgTMP = MakeTMP(boardPanel, "SpecialMessageText", "", 46f, new Color(1f, 0.95f, 0.2f));
         Anchor(specialMsgTMP.gameObject, new Vector2(0.05f, 0.40f), new Vector2(0.95f, 0.60f));
         specialMsgTMP.fontStyle = FontStyles.Bold;
         specialMsgTMP.gameObject.SetActive(false);
+        specialMsgTMP.characterSpacing = 1.5f;
 
         // Draw Card button — anchored to bottom strip, hidden until it's draw time
         var drawCardBtn = MakeButton(boardPanel, "DrawCardButton", "Draw a Card!");
@@ -205,6 +223,7 @@ public static class JungleSceneBuilder
         bsRT.anchorMin = bsRT.anchorMax = new Vector2(0.5f, 0.48f);
         bsRT.sizeDelta        = Vector2.zero;
         bsRT.anchoredPosition = Vector2.zero;
+        boardSpacesGO.transform.SetSiblingIndex(1);
 
         const float xMin   = -700f, xMax   =  700f;
         const float yStart = -300f, yStep  =  120f;
@@ -313,6 +332,7 @@ public static class JungleSceneBuilder
             "You reached the Waterfall!\nYOU WIN!", 80f, Color.white);
         Anchor(winTMP.gameObject, new Vector2(0.05f, 0.35f), new Vector2(0.95f, 0.75f));
         winTMP.fontStyle = FontStyles.Bold;
+        winTMP.characterSpacing = 4f;
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         //   PLAYER TOKEN PREFAB
@@ -321,7 +341,47 @@ public static class JungleSceneBuilder
         var tokenGO = new GameObject("PlayerToken");
         var trt     = tokenGO.AddComponent<RectTransform>();
         trt.sizeDelta = new Vector2(54, 54);
-        tokenGO.AddComponent<Image>().color = Color.white;
+        var tokenShadow = new GameObject("Shadow");
+        tokenShadow.transform.SetParent(tokenGO.transform, false);
+        var tokenShadowRT = tokenShadow.AddComponent<RectTransform>();
+        tokenShadowRT.anchorMin = Vector2.zero;
+        tokenShadowRT.anchorMax = Vector2.one;
+        tokenShadowRT.offsetMin = new Vector2(5f, -5f);
+        tokenShadowRT.offsetMax = new Vector2(5f, -5f);
+        tokenShadow.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.22f);
+
+        var tokenRing = tokenGO.AddComponent<Image>();
+        tokenRing.color = new Color(0.23f, 0.15f, 0.05f, 1f);
+
+        var tokenFace = new GameObject("Face");
+        tokenFace.transform.SetParent(tokenGO.transform, false);
+        var tokenFaceRT = tokenFace.AddComponent<RectTransform>();
+        tokenFaceRT.anchorMin = new Vector2(0.14f, 0.14f);
+        tokenFaceRT.anchorMax = new Vector2(0.86f, 0.86f);
+        tokenFaceRT.offsetMin = tokenFaceRT.offsetMax = Vector2.zero;
+        tokenFace.AddComponent<Image>().color = Color.white;
+
+        var tokenShine = new GameObject("Shine");
+        tokenShine.transform.SetParent(tokenFace.transform, false);
+        var tokenShineRT = tokenShine.AddComponent<RectTransform>();
+        tokenShineRT.anchorMin = new Vector2(0.16f, 0.56f);
+        tokenShineRT.anchorMax = new Vector2(0.84f, 0.84f);
+        tokenShineRT.offsetMin = tokenShineRT.offsetMax = Vector2.zero;
+        tokenShineRT.localRotation = Quaternion.Euler(0, 0, -10f);
+        tokenShine.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.28f);
+
+        var tokenMark = new GameObject("Mark");
+        tokenMark.transform.SetParent(tokenGO.transform, false);
+        var tokenMarkRT = tokenMark.AddComponent<RectTransform>();
+        tokenMarkRT.anchorMin = new Vector2(0.24f, 0.24f);
+        tokenMarkRT.anchorMax = new Vector2(0.76f, 0.76f);
+        tokenMarkRT.offsetMin = tokenMarkRT.offsetMax = Vector2.zero;
+        var tokenMarkTMP = tokenMark.AddComponent<TextMeshProUGUI>();
+        tokenMarkTMP.text = "!";
+        tokenMarkTMP.fontSize = 28f;
+        tokenMarkTMP.fontStyle = FontStyles.Bold;
+        tokenMarkTMP.color = new Color(0.16f, 0.10f, 0.02f, 0.90f);
+        tokenMarkTMP.alignment = TextAlignmentOptions.Center;
 
         string       pfPath     = "Assets/ChasesJungleAdventure/PlayerToken.prefab";
         var          tokenPrefab = PrefabUtility.SaveAsPrefabAsset(tokenGO, pfPath);
@@ -372,7 +432,9 @@ public static class JungleSceneBuilder
         soUI.FindProperty("drawCardButton").objectReferenceValue     = drawCardBtn;
         soUI.FindProperty("playerTurnText").objectReferenceValue     = playerTurnTMP;
         soUI.FindProperty("cardDrawnText").objectReferenceValue      = cardDrawnTMP;
+        soUI.FindProperty("countingPlate").objectReferenceValue      = countingPlate;
         soUI.FindProperty("countingText").objectReferenceValue       = countingTMP;
+        soUI.FindProperty("specialMessagePlate").objectReferenceValue = specialPlate;
         soUI.FindProperty("specialMessageText").objectReferenceValue = specialMsgTMP;
         soUI.FindProperty("winText").objectReferenceValue            = winTMP;
         soUI.FindProperty("playerCountText").objectReferenceValue    = playerCountTMP;
@@ -423,6 +485,13 @@ public static class JungleSceneBuilder
         return go;
     }
 
+    static void DecorateMenuPanel(GameObject panel, Color plateColor, Color sparkleColor)
+    {
+        MakeStretch(panel, "TopGlow", new Vector2(0f, 0.62f), new Vector2(1f, 1f), sparkleColor);
+        MakeStretch(panel, "BottomShade", new Vector2(0f, 0f), new Vector2(1f, 0.26f), new Color(0f, 0f, 0f, 0.14f));
+        MakeRoundedPlate(panel, "MainPlate", new Vector2(0.5f, 0.50f), new Vector2(1240f, 720f), plateColor, 0f).transform.SetAsFirstSibling();
+    }
+
     static void DecorateBoardBackground(GameObject boardPanel)
     {
         MakeStretch(boardPanel, "SkyBand", new Vector2(0f, 0.55f), new Vector2(1f, 1f), new Color(0.34f, 0.67f, 0.92f));
@@ -437,6 +506,27 @@ public static class JungleSceneBuilder
 
         MakeRibbon(boardPanel, "RiverRibbon", new Vector2(0.79f, 0.47f), new Vector2(480f, 120f), -18f, new Color(0.22f, 0.70f, 0.95f, 0.60f));
         MakeRibbon(boardPanel, "WaterfallGlow", new Vector2(0.93f, 0.71f), new Vector2(180f, 420f), 0f, WaterfallColor);
+    }
+
+    static GameObject MakeRoundedPlate(GameObject parent, string name, Vector2 anchor, Vector2 size, Color color, float angle)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent.transform, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = anchor;
+        rt.sizeDelta = size;
+        rt.anchoredPosition = Vector2.zero;
+        rt.localRotation = Quaternion.Euler(0, 0, angle);
+        go.AddComponent<Image>().color = color;
+
+        var shine = new GameObject("Shine");
+        shine.transform.SetParent(go.transform, false);
+        var shineRt = shine.AddComponent<RectTransform>();
+        shineRt.anchorMin = new Vector2(0.05f, 0.58f);
+        shineRt.anchorMax = new Vector2(0.95f, 0.92f);
+        shineRt.offsetMin = shineRt.offsetMax = Vector2.zero;
+        shine.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.08f);
+        return go;
     }
 
     static void MakeLeafCluster(GameObject parent, string name, Vector2 anchor, float size, Color color, float tilt)
@@ -567,8 +657,17 @@ public static class JungleSceneBuilder
         var go = new GameObject(name);
         go.transform.SetParent(parent.transform, false);
         go.AddComponent<RectTransform>();
-        go.AddComponent<Image>().color = new Color(0.15f, 0.55f, 0.15f);
+        go.AddComponent<Image>().color = new Color(0.18f, 0.58f, 0.19f);
         var btn = go.AddComponent<Button>();
+
+        var outline = new GameObject("Outline");
+        outline.transform.SetParent(go.transform, false);
+        var ort = outline.AddComponent<RectTransform>();
+        ort.anchorMin = new Vector2(0.03f, 0.08f);
+        ort.anchorMax = new Vector2(0.97f, 0.92f);
+        ort.offsetMin = ort.offsetMax = Vector2.zero;
+        outline.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.10f);
+        outline.transform.SetAsFirstSibling();
 
         var lblGO = new GameObject("Text");
         lblGO.transform.SetParent(go.transform, false);
@@ -578,6 +677,8 @@ public static class JungleSceneBuilder
         var tmp = lblGO.AddComponent<TextMeshProUGUI>();
         tmp.text      = label;
         tmp.fontSize  = 38f;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.characterSpacing = 2f;
         tmp.color     = Color.white;
         tmp.alignment = TextAlignmentOptions.Center;
         return btn;

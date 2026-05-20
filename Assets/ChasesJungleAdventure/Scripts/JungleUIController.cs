@@ -37,7 +37,9 @@ public class JungleUIController : MonoBehaviour
     public Button drawCardButton;
     public TMP_Text playerTurnText;
     public TMP_Text cardDrawnText;
+    public GameObject countingPlate;
     public TMP_Text countingText;
+    public GameObject specialMessagePlate;
     public TMP_Text specialMessageText;
 
     // ── Board Spaces ─────────────────────────────────────────────────────────
@@ -98,7 +100,9 @@ public class JungleUIController : MonoBehaviour
     {
         playerSetupPanel.SetActive(false);
         gameBoardPanel.SetActive(true);
+        if (specialMessagePlate != null) specialMessagePlate.SetActive(false);
         if (specialMessageText != null) specialMessageText.gameObject.SetActive(false);
+        if (countingPlate       != null) countingPlate.SetActive(false);
         if (countingText       != null) countingText.gameObject.SetActive(false);
         if (drawCardButton     != null) drawCardButton.gameObject.SetActive(false);
     }
@@ -133,12 +137,14 @@ public class JungleUIController : MonoBehaviour
     public void ShowCountingNumber(int current, int total)
     {
         if (countingText == null) return;
+        if (countingPlate != null) countingPlate.SetActive(true);
         countingText.gameObject.SetActive(true);
         countingText.text = current.ToString();
     }
 
     public void HideCountingDisplay()
     {
+        if (countingPlate != null) countingPlate.SetActive(false);
         if (countingText  != null) countingText.gameObject.SetActive(false);
         if (cardDrawnText != null) cardDrawnText.text = "";
     }
@@ -199,6 +205,7 @@ public class JungleUIController : MonoBehaviour
 
         if (specialMessageText != null && message.Length > 0)
         {
+            if (specialMessagePlate != null) specialMessagePlate.SetActive(true);
             specialMessageText.text = message;
             specialMessageText.gameObject.SetActive(true);
         }
@@ -217,6 +224,7 @@ public class JungleUIController : MonoBehaviour
 
     public void HideSpecialMessage()
     {
+        if (specialMessagePlate != null) specialMessagePlate.SetActive(false);
         if (specialMessageText != null)
             specialMessageText.gameObject.SetActive(false);
     }
