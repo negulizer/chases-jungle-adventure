@@ -32,6 +32,15 @@ public static class JungleSceneBuilder
         new Color(1.00f, 0.58f, 0.10f),
     };
 
+    static readonly Color PathShadowColor     = new Color(0.18f, 0.10f, 0.02f, 0.32f);
+    static readonly Color PathBaseColor       = new Color(0.78f, 0.58f, 0.20f, 0.96f);
+    static readonly Color PathHighlightColor  = new Color(0.95f, 0.84f, 0.48f, 0.92f);
+    static readonly Color PanelJungleTint     = new Color(0.06f, 0.28f, 0.12f);
+    static readonly Color LeafDarkColor       = new Color(0.08f, 0.31f, 0.12f, 0.90f);
+    static readonly Color LeafLightColor      = new Color(0.20f, 0.50f, 0.18f, 0.75f);
+    static readonly Color MistColor           = new Color(1f, 1f, 1f, 0.08f);
+    static readonly Color WaterfallColor      = new Color(0.52f, 0.86f, 1.00f, 0.50f);
+
     // ── Find a user script type without a hard compile-time reference ────────
     // This means the scene builder compiles even before the game scripts exist.
     static System.Type G(string name) =>
@@ -114,8 +123,10 @@ public static class JungleSceneBuilder
         // ── Four full-screen panels ───────────────────────────────────────────
         var welcomePanel = MakePanel(canvasGO, "WelcomePanel",     new Color(0.08f, 0.40f, 0.08f));
         var setupPanel   = MakePanel(canvasGO, "PlayerSetupPanel", new Color(0.08f, 0.25f, 0.50f));
-        var boardPanel   = MakePanel(canvasGO, "GameBoardPanel",   new Color(0.04f, 0.20f, 0.04f));
+        var boardPanel   = MakePanel(canvasGO, "GameBoardPanel",   PanelJungleTint);
         var winPanel     = MakePanel(canvasGO, "WinPanel",         new Color(0.85f, 0.65f, 0.05f));
+
+        DecorateBoardBackground(boardPanel);
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         //   WELCOME PANEL
@@ -208,17 +219,25 @@ public static class JungleSceneBuilder
             spacePts[i] = new Vector2(x, yStart + row * yStep);
         }
 
-        // Brown connectors between consecutive spaces (drawn first, so spaces appear on top)
+        // Board trail under the spaces. Wide segments and turn pads make the path feel
+        // like one continuous Candy Land-style ribbon instead of isolated squares.
         for (int i = 0; i < 59; i++)
         {
-            var cGO = new GameObject($"Conn_{i:D2}");
-            cGO.transform.SetParent(boardSpacesGO.transform, false);
-            var crt = cGO.AddComponent<RectTransform>();
             var dir = spacePts[i + 1] - spacePts[i];
-            crt.anchoredPosition = (spacePts[i] + spacePts[i + 1]) * 0.5f;
-            crt.sizeDelta        = new Vector2(dir.magnitude - 52f, 12f);
-            crt.localRotation    = Quaternion.Euler(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
-            cGO.AddComponent<Image>().color = new Color(0.55f, 0.35f, 0.08f, 0.75f);
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            Vector2 center = (spacePts[i] + spacePts[i + 1]) * 0.5f;
+
+            MakeTrailSegment(boardSpacesGO, $"ConnShadow_{i:D2}", center, dir.magnitude - 38f, 52f, angle, PathShadowColor, new Vector2(0, -7f));
+            MakeTrailSegment(boardSpacesGO, $"ConnBase_{i:D2}", center, dir.magnitude - 44f, 42f, angle, PathBaseColor);
+            MakeTrailSegment(boardSpacesGO, $"ConnHighlight_{i:D2}", center, dir.magnitude - 58f, 18f, angle, PathHighlightColor, new Vector2(0, 3f));
+        }
+
+        for (int i = 0; i < 60; i++)
+        {
+            bool edgeTurn = i == 9 || i == 10 || i == 19 || i == 20 || i == 29 || i == 30 || i == 39 || i == 40 || i == 49 || i == 50;
+            if (!edgeTurn) continue;
+
+            MakeTurnPad(boardSpacesGO, $"TurnPad_{i:D2}", spacePts[i]);
         }
 
         // Special-space labels
@@ -238,8 +257,10 @@ public static class JungleSceneBuilder
             spGO.transform.SetParent(boardSpacesGO.transform, false);
 
             var rt = spGO.AddComponent<RectTransform>();
-            rt.sizeDelta        = new Vector2(68, 68);
+            bool isSpecial = i == 0 || i == 7 || i == 15 || i == 22 || i == 35 || i == 40 || i == 59;
+            rt.sizeDelta        = isSpecial ? new Vector2(90, 90) : new Vector2(76, 76);
             rt.anchoredPosition = spacePts[i];
+            rt.localRotation    = Quaternion.Euler(0, 0, ((i % 4) - 1.5f) * 3f);
 
             // Color — special spaces get their own tint
             Color col = SpaceColors[i % SpaceColors.Length];
@@ -249,20 +270,21 @@ public static class JungleSceneBuilder
             else if (i == 7 || i == 15 || i == 22 || i == 35) // obstacle — darkened
                 col = new Color(col.r * 0.60f, col.g * 0.60f, col.b * 0.60f, 1f);
 
-            spGO.AddComponent<Image>().color = col;
+            BuildBoardSpaceVisual(spGO, col, isSpecial);
 
             // Small space-number label (bottom half of the square)
             var numGO  = new GameObject("Num");
             numGO.transform.SetParent(spGO.transform, false);
             var nrt    = numGO.AddComponent<RectTransform>();
-            nrt.anchorMin = new Vector2(0f, 0f);
-            nrt.anchorMax = new Vector2(1f, 0.45f);
+            nrt.anchorMin = new Vector2(0.08f, 0.02f);
+            nrt.anchorMax = new Vector2(0.92f, 0.38f);
             nrt.offsetMin = nrt.offsetMax = Vector2.zero;
             var numTMP = numGO.AddComponent<TextMeshProUGUI>();
             numTMP.text      = i.ToString();
-            numTMP.fontSize  = 13f;
-            numTMP.color     = new Color(1f, 1f, 1f, 0.75f);
-            numTMP.alignment = TextAlignmentOptions.BottomRight;
+            numTMP.fontSize  = isSpecial ? 16f : 13f;
+            numTMP.fontStyle = FontStyles.Bold;
+            numTMP.color     = new Color(0.16f, 0.10f, 0.02f, 0.80f);
+            numTMP.alignment = TextAlignmentOptions.Bottom;
 
             // Named label (top half, special spaces only)
             if (labels[i] != null)
@@ -270,12 +292,12 @@ public static class JungleSceneBuilder
                 var lblGO = new GameObject("Label");
                 lblGO.transform.SetParent(spGO.transform, false);
                 var lrt   = lblGO.AddComponent<RectTransform>();
-                lrt.anchorMin = new Vector2(0f, 0.45f);
-                lrt.anchorMax = Vector2.one;
+                lrt.anchorMin = new Vector2(0.08f, 0.44f);
+                lrt.anchorMax = new Vector2(0.92f, 0.88f);
                 lrt.offsetMin = lrt.offsetMax = Vector2.zero;
                 var lbl   = lblGO.AddComponent<TextMeshProUGUI>();
                 lbl.text      = labels[i];
-                lbl.fontSize  = 10f;
+                lbl.fontSize  = isSpecial ? 16f : 11f;
                 lbl.fontStyle = FontStyles.Bold;
                 lbl.alignment = TextAlignmentOptions.Center;
                 lbl.color     = Color.white;
@@ -399,6 +421,129 @@ public static class JungleSceneBuilder
         rt.offsetMin = rt.offsetMax = Vector2.zero;
         go.AddComponent<Image>().color = bg;
         return go;
+    }
+
+    static void DecorateBoardBackground(GameObject boardPanel)
+    {
+        MakeStretch(boardPanel, "SkyBand", new Vector2(0f, 0.55f), new Vector2(1f, 1f), new Color(0.34f, 0.67f, 0.92f));
+        MakeStretch(boardPanel, "CanopyBack", new Vector2(0f, 0.45f), new Vector2(1f, 0.78f), new Color(0.18f, 0.48f, 0.18f, 0.95f));
+        MakeStretch(boardPanel, "GroundBand", new Vector2(0f, 0f), new Vector2(1f, 0.44f), new Color(0.21f, 0.42f, 0.12f, 1f));
+        MakeStretch(boardPanel, "MistBand", new Vector2(0f, 0.40f), new Vector2(1f, 0.58f), MistColor);
+
+        MakeLeafCluster(boardPanel, "LeafClusterLeftTop", new Vector2(0.10f, 0.88f), 260f, LeafDarkColor, -20f);
+        MakeLeafCluster(boardPanel, "LeafClusterRightTop", new Vector2(0.87f, 0.86f), 300f, LeafLightColor, 18f);
+        MakeLeafCluster(boardPanel, "LeafClusterLeftBottom", new Vector2(0.08f, 0.16f), 280f, LeafLightColor, 22f);
+        MakeLeafCluster(boardPanel, "LeafClusterRightBottom", new Vector2(0.90f, 0.18f), 300f, LeafDarkColor, -18f);
+
+        MakeRibbon(boardPanel, "RiverRibbon", new Vector2(0.79f, 0.47f), new Vector2(480f, 120f), -18f, new Color(0.22f, 0.70f, 0.95f, 0.60f));
+        MakeRibbon(boardPanel, "WaterfallGlow", new Vector2(0.93f, 0.71f), new Vector2(180f, 420f), 0f, WaterfallColor);
+    }
+
+    static void MakeLeafCluster(GameObject parent, string name, Vector2 anchor, float size, Color color, float tilt)
+    {
+        var root = new GameObject(name);
+        root.transform.SetParent(parent.transform, false);
+        var rt = root.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = anchor;
+        rt.sizeDelta = new Vector2(size, size * 0.55f);
+        rt.anchoredPosition = Vector2.zero;
+        rt.localRotation = Quaternion.Euler(0, 0, tilt);
+
+        for (int i = 0; i < 5; i++)
+        {
+            var leaf = new GameObject($"Leaf_{i}");
+            leaf.transform.SetParent(root.transform, false);
+            var lrt = leaf.AddComponent<RectTransform>();
+            lrt.sizeDelta = new Vector2(size * 0.42f, size * 0.16f);
+            lrt.anchoredPosition = new Vector2((i - 2) * size * 0.10f, (i % 2 == 0 ? 18f : -10f));
+            lrt.localRotation = Quaternion.Euler(0, 0, -38f + (i * 18f));
+            leaf.AddComponent<Image>().color = i % 2 == 0 ? color : new Color(color.r + 0.05f, color.g + 0.07f, color.b + 0.02f, color.a * 0.85f);
+        }
+    }
+
+    static void MakeRibbon(GameObject parent, string name, Vector2 anchor, Vector2 size, float angle, Color color)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent.transform, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = anchor;
+        rt.sizeDelta = size;
+        rt.anchoredPosition = Vector2.zero;
+        rt.localRotation = Quaternion.Euler(0, 0, angle);
+        go.AddComponent<Image>().color = color;
+    }
+
+    static void MakeStretch(GameObject parent, string name, Vector2 min, Vector2 max, Color color)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent.transform, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = min;
+        rt.anchorMax = max;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        go.AddComponent<Image>().color = color;
+    }
+
+    static void MakeTrailSegment(GameObject parent, string name, Vector2 center, float width, float height, float angle, Color color, Vector2 offset = default)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent.transform, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = center + offset;
+        rt.sizeDelta = new Vector2(width, height);
+        rt.localRotation = Quaternion.Euler(0, 0, angle);
+        go.AddComponent<Image>().color = color;
+    }
+
+    static void MakeTurnPad(GameObject parent, string name, Vector2 center)
+    {
+        MakeTrailSegment(parent, name + "_Shadow", center, 106f, 106f, 0f, PathShadowColor, new Vector2(0, -7f));
+        MakeTrailSegment(parent, name + "_Base", center, 96f, 96f, 0f, PathBaseColor);
+        MakeTrailSegment(parent, name + "_Highlight", center + new Vector2(0, 3f), 74f, 38f, 0f, PathHighlightColor);
+    }
+
+    static void BuildBoardSpaceVisual(GameObject space, Color fillColor, bool isSpecial)
+    {
+        var shadow = new GameObject("Shadow");
+        shadow.transform.SetParent(space.transform, false);
+        var shadowRt = shadow.AddComponent<RectTransform>();
+        shadowRt.anchorMin = Vector2.zero;
+        shadowRt.anchorMax = Vector2.one;
+        shadowRt.offsetMin = new Vector2(8f, -8f);
+        shadowRt.offsetMax = new Vector2(8f, -8f);
+        shadow.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.18f);
+
+        var ring = space.AddComponent<Image>();
+        ring.color = isSpecial ? new Color(0.26f, 0.20f, 0.05f, 1f) : new Color(0.22f, 0.16f, 0.04f, 0.92f);
+
+        var face = new GameObject("Face");
+        face.transform.SetParent(space.transform, false);
+        var faceRt = face.AddComponent<RectTransform>();
+        faceRt.anchorMin = new Vector2(0.10f, 0.10f);
+        faceRt.anchorMax = new Vector2(0.90f, 0.90f);
+        faceRt.offsetMin = faceRt.offsetMax = Vector2.zero;
+        face.AddComponent<Image>().color = fillColor;
+
+        var shine = new GameObject("Shine");
+        shine.transform.SetParent(face.transform, false);
+        var shineRt = shine.AddComponent<RectTransform>();
+        shineRt.anchorMin = new Vector2(0.12f, 0.56f);
+        shineRt.anchorMax = new Vector2(0.88f, 0.84f);
+        shineRt.offsetMin = shineRt.offsetMax = Vector2.zero;
+        shineRt.localRotation = Quaternion.Euler(0, 0, -8f);
+        shine.AddComponent<Image>().color = new Color(1f, 1f, 1f, isSpecial ? 0.28f : 0.18f);
+
+        if (!isSpecial) return;
+
+        var glow = new GameObject("Glow");
+        glow.transform.SetParent(space.transform, false);
+        var glowRt = glow.AddComponent<RectTransform>();
+        glowRt.anchorMin = new Vector2(-0.08f, -0.08f);
+        glowRt.anchorMax = new Vector2(1.08f, 1.08f);
+        glowRt.offsetMin = glowRt.offsetMax = Vector2.zero;
+        glow.AddComponent<Image>().color = new Color(fillColor.r, fillColor.g, fillColor.b, 0.12f);
+        glow.transform.SetAsFirstSibling();
     }
 
     /// <summary>Creates a TextMeshProUGUI. Call Anchor() afterwards to position it.</summary>
