@@ -189,6 +189,7 @@ public static class JungleSceneBuilder
         // Big counting number — center overlay, hidden except during movement
         var countingPlate = MakeRoundedPlate(boardPanel, "CountingPlate", new Vector2(0.5f, 0.50f), new Vector2(340f, 260f), new Color(0.05f, 0.11f, 0.06f, 0.68f), -4f);
         countingPlate.SetActive(false);
+        countingPlate.transform.SetAsLastSibling();
         var countingTMP = MakeTMP(boardPanel, "CountingText", "", 130f, Color.white);
         Anchor(countingTMP.gameObject, new Vector2(0.35f, 0.38f), new Vector2(0.65f, 0.62f));
         countingTMP.fontStyle = FontStyles.Bold;
@@ -198,6 +199,7 @@ public static class JungleSceneBuilder
         // Special-space message — center overlay, hidden until triggered
         var specialPlate = MakeRoundedPlate(boardPanel, "SpecialPlate", new Vector2(0.5f, 0.50f), new Vector2(1180f, 180f), new Color(0.16f, 0.09f, 0.02f, 0.78f), 0f);
         specialPlate.SetActive(false);
+        specialPlate.transform.SetAsLastSibling();
         var specialMsgTMP = MakeTMP(boardPanel, "SpecialMessageText", "", 46f, new Color(1f, 0.95f, 0.2f));
         Anchor(specialMsgTMP.gameObject, new Vector2(0.05f, 0.40f), new Vector2(0.95f, 0.60f));
         specialMsgTMP.fontStyle = FontStyles.Bold;

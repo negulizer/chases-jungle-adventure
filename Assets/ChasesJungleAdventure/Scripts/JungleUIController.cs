@@ -134,12 +134,21 @@ public class JungleUIController : MonoBehaviour
     }
 
     /// <summary>Shows a big, bold step number so young players can count along.</summary>
+
     public void ShowCountingNumber(int current, int total)
     {
         if (countingText == null) return;
         if (countingPlate != null) countingPlate.SetActive(true);
         countingText.gameObject.SetActive(true);
         countingText.text = current.ToString();
+        StopCoroutine("HideCountingAfterDelay");
+        StartCoroutine("HideCountingAfterDelay");
+    }
+
+    private IEnumerator HideCountingAfterDelay()
+    {
+        yield return new WaitForSeconds(1.0f);
+        HideCountingDisplay();
     }
 
     public void HideCountingDisplay()
@@ -191,6 +200,7 @@ public class JungleUIController : MonoBehaviour
 
     // ── Special Spaces ────────────────────────────────────────────────────────
 
+
     public void ShowSpecialAnimation(JungleBoard.SpecialType type)
     {
         string message = type switch
@@ -208,6 +218,8 @@ public class JungleUIController : MonoBehaviour
             if (specialMessagePlate != null) specialMessagePlate.SetActive(true);
             specialMessageText.text = message;
             specialMessageText.gameObject.SetActive(true);
+            StopCoroutine("HideSpecialAfterDelay");
+            StartCoroutine("HideSpecialAfterDelay");
         }
 
         Animator anim = type switch
@@ -220,6 +232,12 @@ public class JungleUIController : MonoBehaviour
             _                                 => null
         };
         if (anim != null) anim.SetTrigger("Play");
+    }
+
+    private IEnumerator HideSpecialAfterDelay()
+    {
+        yield return new WaitForSeconds(1.5f);
+        HideSpecialMessage();
     }
 
     public void HideSpecialMessage()
