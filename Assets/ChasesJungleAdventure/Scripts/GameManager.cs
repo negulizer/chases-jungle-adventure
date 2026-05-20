@@ -174,12 +174,21 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator HandleSpecialSpace(PlayerToken player, JungleBoard.SpecialSpace special)
     {
-        uiController.ShowSpecialAnimation(special.type); // shows message + plays animator
-        yield return new WaitForSeconds(1.5f);
-        player.position = special.linkedIndex;
-        uiController.MoveToken(player, player.position);
-        yield return new WaitForSeconds(0.75f);
-        uiController.HideSpecialMessage();
+        try
+        {
+            uiController.ShowSpecialAnimation(special.type); // shows message + plays animator
+            yield return new WaitForSeconds(1.5f);
+
+            // Clamp in case a linked index is misconfigured in the inspector.
+            player.position = Mathf.Clamp(special.linkedIndex, 0, jungleBoard.GoalIndex);
+            uiController.MoveToken(player, player.position);
+            yield return new WaitForSeconds(0.75f);
+        }
+        finally
+        {
+            // Always clear the message so UI state cannot block the next turn.
+            uiController.HideSpecialMessage();
+        }
     }
 
     // ── Pause Screen ─────────────────────────────────────────────────────────
