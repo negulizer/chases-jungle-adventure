@@ -212,7 +212,7 @@ public class JungleUIController : MonoBehaviour
             JungleBoard.SpecialType.Raft      => raftAnimator,
             _                                 => null
         };
-        anim?.SetTrigger("Play");
+        if (anim != null) anim.SetTrigger("Play");
     }
 
     public void HideSpecialMessage()
