@@ -223,7 +223,8 @@ public static class JungleSceneBuilder
         bsRT.anchorMin = bsRT.anchorMax = new Vector2(0.5f, 0.48f);
         bsRT.sizeDelta        = Vector2.zero;
         bsRT.anchoredPosition = Vector2.zero;
-        boardSpacesGO.transform.SetSiblingIndex(1);
+        // Keep the board trail and spaces above the decorative background layers.
+        boardSpacesGO.transform.SetAsLastSibling();
 
         const float xMin   = -700f, xMax   =  700f;
         const float yStart = -300f, yStep  =  120f;
