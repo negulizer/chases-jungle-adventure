@@ -2,13 +2,13 @@
   <title id="title">Pink Explorer Token</title>
   <desc id="desc">Bubbly kid explorer standing on a pink jungle token base.</desc>
   <defs>
-    <filter id="base-shadow" x="-20%" y="-20%" width="140%" height="160%">
+    <filter id="pink-base-filter" x="-20%" y="-20%" width="140%" height="160%">
       <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#7A2956" flood-opacity="0.35"/>
     </filter>
   </defs>
   <g id="pink-token">
     <ellipse id="pink-base-shadow" cx="100" cy="162" rx="56" ry="16" fill="#7A2956" opacity="0.28"/>
-    <g id="pink-base" filter="url(#base-shadow)">
+    <g id="pink-base" filter="url(#pink-base-filter)">
       <ellipse cx="100" cy="152" rx="58" ry="18" fill="#AF3F7E" stroke="#3A1330" stroke-width="4"/>
       <ellipse cx="100" cy="146" rx="56" ry="16" fill="#FF6CB5" stroke="#3A1330" stroke-width="4"/>
       <ellipse cx="88" cy="141" rx="24" ry="7" fill="#FFC0E3" opacity="0.7"/>

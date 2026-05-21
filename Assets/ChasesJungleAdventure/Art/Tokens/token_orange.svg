@@ -2,13 +2,13 @@
   <title id="title">Orange Explorer Token</title>
   <desc id="desc">Energetic kid explorer standing on an orange jungle token base.</desc>
   <defs>
-    <filter id="base-shadow" x="-20%" y="-20%" width="140%" height="160%">
+    <filter id="orange-base-filter" x="-20%" y="-20%" width="140%" height="160%">
       <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#8E3E00" flood-opacity="0.35"/>
     </filter>
   </defs>
   <g id="orange-token">
     <ellipse id="orange-base-shadow" cx="100" cy="162" rx="56" ry="16" fill="#8E3E00" opacity="0.28"/>
-    <g id="orange-base" filter="url(#base-shadow)">
+    <g id="orange-base" filter="url(#orange-base-filter)">
       <ellipse cx="100" cy="152" rx="58" ry="18" fill="#BE5800" stroke="#3B1B00" stroke-width="4"/>
       <ellipse cx="100" cy="146" rx="56" ry="16" fill="#FF8D2A" stroke="#3B1B00" stroke-width="4"/>
       <ellipse cx="88" cy="141" rx="24" ry="7" fill="#FFD1A5" opacity="0.7"/>
