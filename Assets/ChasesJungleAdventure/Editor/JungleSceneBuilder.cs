@@ -261,15 +261,10 @@ public static class JungleSceneBuilder
         foreach (int idx in turnSpaces)
             MakeTurnCircle(boardSpacesGO, $"TurnPad_{idx:D2}", spacePts[idx], circleSprite);
 
-        // Special-space labels (icon-only, no text words)
+        // Text labels are only used for START/WIN.
         var labels = new string[60];
         labels[0]  = "START";
-        labels[7]  = "\U0001F577";
-        labels[15] = "\U0001F40D";
-        labels[22] = "\U0001F412";
-        labels[35] = "\U0001F40A";
-        labels[40] = "\U0001F6F6";
-        labels[59] = "\U0001F3C6\nWIN!";
+        labels[59] = "WIN";
 
         var spaceRTs = new RectTransform[60];
         for (int i = 0; i < 60; i++)
@@ -292,18 +287,25 @@ public static class JungleSceneBuilder
 
             BuildBoardSpaceVisual(spGO, col, isSpecial, circleSprite);
 
-            // Named label (top half, special spaces only)
+            // Real icon graphics for special spaces (no emoji text fallback boxes).
+            if (i == 7)  AddSpecialIconGraphic(spGO.transform, "Spider", circleSprite);
+            if (i == 15) AddSpecialIconGraphic(spGO.transform, "Snake", circleSprite);
+            if (i == 22) AddSpecialIconGraphic(spGO.transform, "Monkey", circleSprite);
+            if (i == 35) AddSpecialIconGraphic(spGO.transform, "Alligator", circleSprite);
+            if (i == 40) AddSpecialIconGraphic(spGO.transform, "Raft", circleSprite);
+
+            // START/WIN labels only.
             if (labels[i] != null)
             {
                 var lblGO = new GameObject("Label");
                 lblGO.transform.SetParent(spGO.transform, false);
                 var lrt   = lblGO.AddComponent<RectTransform>();
-                lrt.anchorMin = new Vector2(-0.1f, isSpecial ? 0.18f : 0.38f);
-                lrt.anchorMax = new Vector2(1.1f, 0.86f);
+                lrt.anchorMin = new Vector2(-0.10f, 0.04f);
+                lrt.anchorMax = new Vector2(1.10f, 0.44f);
                 lrt.offsetMin = lrt.offsetMax = Vector2.zero;
                 var lbl   = lblGO.AddComponent<TextMeshProUGUI>();
                 lbl.text      = labels[i];
-                lbl.fontSize  = isSpecial ? 44f : 11f;
+                lbl.fontSize  = 16f;
                 lbl.fontStyle = FontStyles.Bold;
                 lbl.alignment = TextAlignmentOptions.Center;
                 lbl.color     = Color.white;
@@ -355,6 +357,19 @@ public static class JungleSceneBuilder
         var swatchImg = swatchGO.AddComponent<Image>();
         swatchImg.color = Color.red;
         if (circleSprite != null) swatchImg.sprite = circleSprite;
+
+        // Dedicated special-card icons layered in the same region as the color swatch.
+        var specialIconsGO = new GameObject("SpecialIcons");
+        specialIconsGO.transform.SetParent(cardVisualGO.transform, false);
+        var siRT = specialIconsGO.AddComponent<RectTransform>();
+        siRT.anchorMin = new Vector2(0.12f, 0.24f); siRT.anchorMax = new Vector2(0.88f, 0.88f);
+        siRT.offsetMin = siRT.offsetMax = Vector2.zero;
+        AddSpecialIconGraphic(specialIconsGO.transform, "Spider", circleSprite);
+        AddSpecialIconGraphic(specialIconsGO.transform, "Snake", circleSprite);
+        AddSpecialIconGraphic(specialIconsGO.transform, "Monkey", circleSprite);
+        AddSpecialIconGraphic(specialIconsGO.transform, "Alligator", circleSprite);
+        AddSpecialIconGraphic(specialIconsGO.transform, "Raft", circleSprite);
+        specialIconsGO.SetActive(false);
 
         // Shine on swatch
         var swatchShine = new GameObject("Shine"); swatchShine.transform.SetParent(swatchGO.transform, false);
@@ -719,6 +734,109 @@ public static class JungleSceneBuilder
             if (circle != null) glowImg.sprite = circle;
             glow.transform.SetAsFirstSibling();
         }
+    }
+
+    static void AddSpecialIconGraphic(Transform parent, string type, Sprite circle)
+    {
+        var root = new GameObject(type);
+        root.transform.SetParent(parent, false);
+        var rrt = root.AddComponent<RectTransform>();
+        rrt.anchorMin = new Vector2(0.18f, 0.18f);
+        rrt.anchorMax = new Vector2(0.82f, 0.82f);
+        rrt.offsetMin = rrt.offsetMax = Vector2.zero;
+
+        // Badge background
+        var bg = new GameObject("Bg");
+        bg.transform.SetParent(root.transform, false);
+        var bgrt = bg.AddComponent<RectTransform>();
+        bgrt.anchorMin = new Vector2(0.10f, 0.10f);
+        bgrt.anchorMax = new Vector2(0.90f, 0.90f);
+        bgrt.offsetMin = bgrt.offsetMax = Vector2.zero;
+        var bgImg = bg.AddComponent<Image>();
+        bgImg.color = new Color(1f, 1f, 1f, 0.92f);
+        if (circle != null) bgImg.sprite = circle;
+
+        switch (type)
+        {
+            case "Spider":
+                AddCircle(root.transform, "Body", new Vector2(0.34f, 0.32f), new Vector2(0.66f, 0.64f), new Color(0.22f, 0.22f, 0.24f), circle);
+                AddCircle(root.transform, "Head", new Vector2(0.40f, 0.56f), new Vector2(0.60f, 0.76f), new Color(0.18f, 0.18f, 0.20f), circle);
+                AddLeg(root.transform, "L1", new Vector2(0.24f, 0.56f), 36f);
+                AddLeg(root.transform, "L2", new Vector2(0.22f, 0.46f), 18f);
+                AddLeg(root.transform, "L3", new Vector2(0.22f, 0.36f), -18f);
+                AddLeg(root.transform, "L4", new Vector2(0.24f, 0.26f), -36f);
+                AddLeg(root.transform, "R1", new Vector2(0.76f, 0.56f), -36f);
+                AddLeg(root.transform, "R2", new Vector2(0.78f, 0.46f), -18f);
+                AddLeg(root.transform, "R3", new Vector2(0.78f, 0.36f), 18f);
+                AddLeg(root.transform, "R4", new Vector2(0.76f, 0.26f), 36f);
+                break;
+
+            case "Snake":
+                AddCircle(root.transform, "S1", new Vector2(0.18f, 0.34f), new Vector2(0.42f, 0.58f), new Color(0.35f, 0.72f, 0.23f), circle);
+                AddCircle(root.transform, "S2", new Vector2(0.36f, 0.42f), new Vector2(0.60f, 0.66f), new Color(0.30f, 0.66f, 0.20f), circle);
+                AddCircle(root.transform, "S3", new Vector2(0.54f, 0.30f), new Vector2(0.82f, 0.58f), new Color(0.26f, 0.60f, 0.18f), circle);
+                AddCircle(root.transform, "Eye", new Vector2(0.66f, 0.44f), new Vector2(0.74f, 0.52f), Color.white, circle);
+                break;
+
+            case "Monkey":
+                AddCircle(root.transform, "Head", new Vector2(0.28f, 0.30f), new Vector2(0.72f, 0.74f), new Color(0.70f, 0.46f, 0.27f), circle);
+                AddCircle(root.transform, "EarL", new Vector2(0.16f, 0.44f), new Vector2(0.34f, 0.62f), new Color(0.64f, 0.40f, 0.23f), circle);
+                AddCircle(root.transform, "EarR", new Vector2(0.66f, 0.44f), new Vector2(0.84f, 0.62f), new Color(0.64f, 0.40f, 0.23f), circle);
+                AddCircle(root.transform, "Muzzle", new Vector2(0.38f, 0.34f), new Vector2(0.62f, 0.52f), new Color(0.90f, 0.78f, 0.58f), circle);
+                break;
+
+            case "Alligator":
+                AddRect(root.transform, "Body", new Vector2(0.20f, 0.34f), new Vector2(0.80f, 0.62f), new Color(0.17f, 0.60f, 0.38f));
+                AddRect(root.transform, "Jaw", new Vector2(0.56f, 0.28f), new Vector2(0.84f, 0.46f), new Color(0.20f, 0.68f, 0.43f));
+                AddCircle(root.transform, "Eye", new Vector2(0.30f, 0.52f), new Vector2(0.38f, 0.60f), Color.white, circle);
+                AddRect(root.transform, "Tooth1", new Vector2(0.64f, 0.28f), new Vector2(0.67f, 0.38f), Color.white);
+                AddRect(root.transform, "Tooth2", new Vector2(0.70f, 0.28f), new Vector2(0.73f, 0.38f), Color.white);
+                break;
+
+            case "Raft":
+                AddRect(root.transform, "Plank1", new Vector2(0.20f, 0.34f), new Vector2(0.80f, 0.42f), new Color(0.73f, 0.49f, 0.24f));
+                AddRect(root.transform, "Plank2", new Vector2(0.20f, 0.44f), new Vector2(0.80f, 0.52f), new Color(0.78f, 0.54f, 0.28f));
+                AddRect(root.transform, "Plank3", new Vector2(0.20f, 0.54f), new Vector2(0.80f, 0.62f), new Color(0.73f, 0.49f, 0.24f));
+                AddRect(root.transform, "RopeL", new Vector2(0.24f, 0.32f), new Vector2(0.28f, 0.64f), new Color(0.40f, 0.26f, 0.12f));
+                AddRect(root.transform, "RopeR", new Vector2(0.72f, 0.32f), new Vector2(0.76f, 0.64f), new Color(0.40f, 0.26f, 0.12f));
+                break;
+        }
+    }
+
+    static void AddCircle(Transform parent, string name, Vector2 min, Vector2 max, Color color, Sprite circle)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = min;
+        rt.anchorMax = max;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        var img = go.AddComponent<Image>();
+        img.color = color;
+        if (circle != null) img.sprite = circle;
+    }
+
+    static void AddRect(Transform parent, string name, Vector2 min, Vector2 max, Color color)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = min;
+        rt.anchorMax = max;
+        rt.offsetMin = rt.offsetMax = Vector2.zero;
+        go.AddComponent<Image>().color = color;
+    }
+
+    static void AddLeg(Transform parent, string name, Vector2 anchor, float angle)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = anchor;
+        rt.sizeDelta = new Vector2(0.18f * 128f, 0.035f * 128f);
+        rt.anchoredPosition = Vector2.zero;
+        rt.localRotation = Quaternion.Euler(0f, 0f, angle);
+        go.AddComponent<Image>().color = new Color(0.16f, 0.16f, 0.18f, 1f);
     }
 
     /// <summary>Creates a TextMeshProUGUI. Call Anchor() afterwards to position it.</summary>

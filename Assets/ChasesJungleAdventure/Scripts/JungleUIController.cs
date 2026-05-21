@@ -105,6 +105,8 @@ public class JungleUIController : MonoBehaviour
     {
         playerSetupPanel.SetActive(false);
         gameBoardPanel.SetActive(true);
+        HideSpecialCardIcons();
+        if (cardColorSwatch != null) cardColorSwatch.gameObject.SetActive(true);
         if (cardVisual           != null) cardVisual.SetActive(false);
         if (specialMessagePlate != null) specialMessagePlate.SetActive(false);
         if (specialMessageText != null) specialMessageText.gameObject.SetActive(false);
@@ -137,16 +139,19 @@ public class JungleUIController : MonoBehaviour
 
         if (card.kind == CardSystem.CardKind.Special)
         {
-            if (cardColorSwatch != null)
-                cardColorSwatch.color = SpecialTypeToRGB(card.specialType);
+            ShowSpecialCardIcon(card.specialType);
 
             if (cardDrawnText != null)
-                cardDrawnText.text = $"{SpecialTypeToEmoji(card.specialType)} {SpecialTypeToName(card.specialType)} card! {moveText}";
+                cardDrawnText.text = $"{SpecialTypeToName(card.specialType)} card! {moveText}";
         }
         else
         {
+            HideSpecialCardIcons();
             if (cardColorSwatch != null)
+            {
+                cardColorSwatch.gameObject.SetActive(true);
                 cardColorSwatch.color = SpaceColorToRGB(card.color);
+            }
 
             if (cardDrawnText != null)
                 cardDrawnText.text = moveText;
@@ -172,26 +177,6 @@ public class JungleUIController : MonoBehaviour
         _                             => Color.white
     };
 
-    private static Color SpecialTypeToRGB(JungleBoard.SpecialType t) => t switch
-    {
-        JungleBoard.SpecialType.Spider    => new Color(0.33f, 0.33f, 0.36f),
-        JungleBoard.SpecialType.Snake     => new Color(0.35f, 0.72f, 0.23f),
-        JungleBoard.SpecialType.Monkey    => new Color(0.72f, 0.45f, 0.25f),
-        JungleBoard.SpecialType.Alligator => new Color(0.18f, 0.62f, 0.40f),
-        JungleBoard.SpecialType.Raft      => new Color(0.16f, 0.72f, 0.86f),
-        _                                 => Color.white
-    };
-
-    private static string SpecialTypeToEmoji(JungleBoard.SpecialType t) => t switch
-    {
-        JungleBoard.SpecialType.Spider    => "🕷",
-        JungleBoard.SpecialType.Snake     => "🐍",
-        JungleBoard.SpecialType.Monkey    => "🐒",
-        JungleBoard.SpecialType.Alligator => "🐊",
-        JungleBoard.SpecialType.Raft      => "🛶",
-        _                                 => ""
-    };
-
     private static string SpecialTypeToName(JungleBoard.SpecialType t) => t switch
     {
         JungleBoard.SpecialType.Spider    => "Spider",
@@ -202,10 +187,46 @@ public class JungleUIController : MonoBehaviour
         _                                 => ""
     };
 
+    private void HideSpecialCardIcons()
+    {
+        if (cardVisual == null) return;
+        var root = cardVisual.transform.Find("SpecialIcons");
+        if (root == null) return;
+
+        root.gameObject.SetActive(false);
+        foreach (Transform child in root)
+            child.gameObject.SetActive(false);
+    }
+
+    private void ShowSpecialCardIcon(JungleBoard.SpecialType type)
+    {
+        if (cardColorSwatch != null) cardColorSwatch.gameObject.SetActive(false);
+        if (cardVisual == null) return;
+
+        var root = cardVisual.transform.Find("SpecialIcons");
+        if (root == null) return;
+
+        string iconName = type switch
+        {
+            JungleBoard.SpecialType.Spider    => "Spider",
+            JungleBoard.SpecialType.Snake     => "Snake",
+            JungleBoard.SpecialType.Monkey    => "Monkey",
+            JungleBoard.SpecialType.Alligator => "Alligator",
+            JungleBoard.SpecialType.Raft      => "Raft",
+            _                                 => ""
+        };
+
+        root.gameObject.SetActive(true);
+        foreach (Transform child in root)
+            child.gameObject.SetActive(child.name == iconName);
+    }
+
     private IEnumerator HideCardAfterDelay()
     {
         yield return new WaitForSeconds(1.8f);
         if (cardVisual != null) cardVisual.SetActive(false);
+        HideSpecialCardIcons();
+        if (cardColorSwatch != null) cardColorSwatch.gameObject.SetActive(true);
     }
 
     /// <summary>Shows a big, bold step number so young players can count along.</summary>
