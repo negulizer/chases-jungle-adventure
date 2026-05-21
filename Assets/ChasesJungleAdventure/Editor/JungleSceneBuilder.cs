@@ -328,6 +328,13 @@ public static class JungleSceneBuilder
             spaceRTs[i] = rt;
         }
 
+        // ── Ensure overlays are always on top ─────────────────────────────
+        // (Counting and special message plates/texts must be above all board/tokens)
+        countingPlate.transform.SetAsLastSibling();
+        countingTMP.transform.SetAsLastSibling();
+        specialPlate.transform.SetAsLastSibling();
+        specialMsgTMP.transform.SetAsLastSibling();
+
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         //   WIN PANEL
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
