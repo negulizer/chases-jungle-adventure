@@ -37,6 +37,11 @@ public class JungleUIController : MonoBehaviour
     public Button drawCardButton;
     public TMP_Text playerTurnText;
     public TMP_Text cardDrawnText;
+
+    [Header("Card Visual")]
+    public GameObject cardVisual;       // White card popup shown when a card is drawn
+    public Image cardColorSwatch;       // Colored swatch inside the card
+
     public GameObject countingPlate;
     public TMP_Text countingText;
     public GameObject specialMessagePlate;
@@ -100,6 +105,7 @@ public class JungleUIController : MonoBehaviour
     {
         playerSetupPanel.SetActive(false);
         gameBoardPanel.SetActive(true);
+        if (cardVisual           != null) cardVisual.SetActive(false);
         if (specialMessagePlate != null) specialMessagePlate.SetActive(false);
         if (specialMessageText != null) specialMessageText.gameObject.SetActive(false);
         if (countingPlate       != null) countingPlate.SetActive(false);
@@ -127,10 +133,34 @@ public class JungleUIController : MonoBehaviour
     /// <param name="steps">How many spaces the token will travel — shown so kids know what to count to.</param>
     public void ShowDrawnCard(CardSystem.Card card, int steps)
     {
+        // Show the colour-coded card visual
+        if (cardColorSwatch != null) cardColorSwatch.color = SpaceColorToRGB(card.color);
+        if (cardVisual != null)
+        {
+            cardVisual.SetActive(true);
+            cardVisual.transform.SetAsLastSibling();
+            StopCoroutine("HideCardAfterDelay");
+            StartCoroutine("HideCardAfterDelay");
+        }
         if (cardDrawnText != null)
-            cardDrawnText.text =
-                $"You drew {card.color.ToString().ToUpper()}!\n" +
-                $"Moving {steps} space{(steps == 1 ? "" : "s")}!";
+            cardDrawnText.text = $"Moving {steps} space{(steps == 1 ? "" : "s")}!";
+    }
+
+    private static Color SpaceColorToRGB(JungleBoard.SpaceColor c) => c switch
+    {
+        JungleBoard.SpaceColor.Red    => new Color(0.95f, 0.25f, 0.25f),
+        JungleBoard.SpaceColor.Blue   => new Color(0.25f, 0.45f, 1.00f),
+        JungleBoard.SpaceColor.Green  => new Color(0.15f, 0.80f, 0.20f),
+        JungleBoard.SpaceColor.Yellow => new Color(1.00f, 0.88f, 0.10f),
+        JungleBoard.SpaceColor.Purple => new Color(0.65f, 0.15f, 0.95f),
+        JungleBoard.SpaceColor.Orange => new Color(1.00f, 0.58f, 0.10f),
+        _                             => Color.white
+    };
+
+    private IEnumerator HideCardAfterDelay()
+    {
+        yield return new WaitForSeconds(1.8f);
+        if (cardVisual != null) cardVisual.SetActive(false);
     }
 
     /// <summary>Shows a big, bold step number so young players can count along.</summary>

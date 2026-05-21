@@ -122,6 +122,9 @@ public class GameManager : MonoBehaviour
         playerManager.ResetPlayers();
 #endif
         uiController.ShowGameBoard();
+        // Snap every token to space 0 immediately so they appear at START, not center.
+        for (int i = 0; i < playerManager.PlayerCount; i++)
+            uiController.MoveToken(playerManager.GetPlayer(i), 0);
         StartCoroutine(TurnLoop());
     }
 

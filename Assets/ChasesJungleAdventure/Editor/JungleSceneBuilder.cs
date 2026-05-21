@@ -218,6 +218,10 @@ public static class JungleSceneBuilder
         //   xMin=-700  xMax=700  → 10 spaces, 155.5 px apart horizontally
         //   yStart=-300  yStep=120 → 6 rows (y = -300,-180,-60,+60,+180,+300)
 
+        // Circle sprite needed for Candy Land-style round spaces.
+        EnsureFolder("Assets/ChasesJungleAdventure");
+        var circleSprite = GetOrCreateCircleSprite();
+
         var boardSpacesGO = new GameObject("BoardSpaces");
         boardSpacesGO.transform.SetParent(boardPanel.transform, false);
         var bsRT = boardSpacesGO.AddComponent<RectTransform>();
@@ -241,36 +245,31 @@ public static class JungleSceneBuilder
             spacePts[i] = new Vector2(x, yStart + row * yStep);
         }
 
-        // Board trail under the spaces. Wide segments and turn pads make the path feel
-        // like one continuous Candy Land-style ribbon instead of isolated squares.
+        // Board trail — single cream ribbon, Candy Land style
         for (int i = 0; i < 59; i++)
         {
             var dir = spacePts[i + 1] - spacePts[i];
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             Vector2 center = (spacePts[i] + spacePts[i + 1]) * 0.5f;
-
-            MakeTrailSegment(boardSpacesGO, $"ConnShadow_{i:D2}", center, dir.magnitude - 38f, 52f, angle, PathShadowColor, new Vector2(0, -7f));
-            MakeTrailSegment(boardSpacesGO, $"ConnBase_{i:D2}", center, dir.magnitude - 44f, 42f, angle, PathBaseColor);
-            MakeTrailSegment(boardSpacesGO, $"ConnHighlight_{i:D2}", center, dir.magnitude - 58f, 18f, angle, PathHighlightColor, new Vector2(0, 3f));
+            float connLen = Mathf.Max(0f, dir.magnitude - 62f);
+            MakeTrailSegment(boardSpacesGO, $"Trail_{i:D2}", center, connLen, 56f, angle,
+                new Color(0.94f, 0.90f, 0.74f, 1f));
         }
 
-        for (int i = 0; i < 60; i++)
-        {
-            bool edgeTurn = i == 9 || i == 10 || i == 19 || i == 20 || i == 29 || i == 30 || i == 39 || i == 40 || i == 49 || i == 50;
-            if (!edgeTurn) continue;
+        // Circular turn pads at row-end positions so corners look rounded
+        int[] turnSpaces = { 9, 10, 19, 20, 29, 30, 39, 40, 49, 50 };
+        foreach (int idx in turnSpaces)
+            MakeTurnCircle(boardSpacesGO, $"TurnPad_{idx:D2}", spacePts[idx], circleSprite);
 
-            MakeTurnPad(boardSpacesGO, $"TurnPad_{i:D2}", spacePts[i]);
-        }
-
-        // Special-space labels
+        // Special-space labels (emoji + short name so they're recognisable at a glance)
         var labels = new string[60];
         labels[0]  = "START";
-        labels[7]  = "SPIDER";
-        labels[15] = "SNAKE";
-        labels[22] = "MONKEY";
-        labels[35] = "GATOR";
-        labels[40] = "RAFT";
-        labels[59] = "WIN!";
+        labels[7]  = "\U0001F577\nSPIDER";
+        labels[15] = "\U0001F40D\nSNAKE";
+        labels[22] = "\U0001F412\nMONKEY";
+        labels[35] = "\U0001F40A\nGATOR";
+        labels[40] = "\U0001F6F6\nRAFT";
+        labels[59] = "\U0001F3C6\nWIN!";
 
         var spaceRTs = new RectTransform[60];
         for (int i = 0; i < 60; i++)
@@ -280,9 +279,8 @@ public static class JungleSceneBuilder
 
             var rt = spGO.AddComponent<RectTransform>();
             bool isSpecial = i == 0 || i == 7 || i == 15 || i == 22 || i == 35 || i == 40 || i == 59;
-            rt.sizeDelta        = isSpecial ? new Vector2(90, 90) : new Vector2(76, 76);
+            rt.sizeDelta        = isSpecial ? new Vector2(90, 90) : new Vector2(80, 80);
             rt.anchoredPosition = spacePts[i];
-            rt.localRotation    = Quaternion.Euler(0, 0, ((i % 4) - 1.5f) * 3f);
 
             // Color — special spaces get their own tint
             Color col = SpaceColors[i % SpaceColors.Length];
@@ -292,7 +290,7 @@ public static class JungleSceneBuilder
             else if (i == 7 || i == 15 || i == 22 || i == 35) // obstacle — darkened
                 col = new Color(col.r * 0.60f, col.g * 0.60f, col.b * 0.60f, 1f);
 
-            BuildBoardSpaceVisual(spGO, col, isSpecial);
+            BuildBoardSpaceVisual(spGO, col, isSpecial, circleSprite);
 
             // Small space-number label (bottom half of the square)
             var numGO  = new GameObject("Num");
@@ -314,15 +312,16 @@ public static class JungleSceneBuilder
                 var lblGO = new GameObject("Label");
                 lblGO.transform.SetParent(spGO.transform, false);
                 var lrt   = lblGO.AddComponent<RectTransform>();
-                lrt.anchorMin = new Vector2(0.08f, 0.44f);
-                lrt.anchorMax = new Vector2(0.92f, 0.88f);
+                lrt.anchorMin = new Vector2(-0.1f, isSpecial ? 0.32f : 0.38f);
+                lrt.anchorMax = new Vector2(1.1f, 0.92f);
                 lrt.offsetMin = lrt.offsetMax = Vector2.zero;
                 var lbl   = lblGO.AddComponent<TextMeshProUGUI>();
                 lbl.text      = labels[i];
-                lbl.fontSize  = isSpecial ? 16f : 11f;
+                lbl.fontSize  = isSpecial ? 14f : 11f;
                 lbl.fontStyle = FontStyles.Bold;
                 lbl.alignment = TextAlignmentOptions.Center;
                 lbl.color     = Color.white;
+                lbl.overflowMode = TextOverflowModes.Overflow;
             }
 
             spaceRTs[i] = rt;
@@ -344,8 +343,54 @@ public static class JungleSceneBuilder
         winTMP.fontStyle = FontStyles.Bold;
         winTMP.characterSpacing = 4f;
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //   PLAYER TOKEN PREFAB
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━        //   DRAWN CARD VISUAL  (Candy Land-style card that pops up mid-board)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        var cardVisualGO = new GameObject("CardVisual");
+        cardVisualGO.transform.SetParent(boardPanel.transform, false);
+        var cvRT = cardVisualGO.AddComponent<RectTransform>();
+        cvRT.anchorMin = cvRT.anchorMax = new Vector2(0.5f, 0.5f);
+        cvRT.sizeDelta = new Vector2(280f, 370f);
+        cvRT.anchoredPosition = new Vector2(0f, 50f);
+        var cvBg = cardVisualGO.AddComponent<Image>();
+        cvBg.color = new Color(0.98f, 0.96f, 0.97f, 1f);
+
+        // Pink inner border
+        var cvInner = new GameObject("Inner"); cvInner.transform.SetParent(cardVisualGO.transform, false);
+        var cvIRT = cvInner.AddComponent<RectTransform>();
+        cvIRT.anchorMin = new Vector2(0.04f, 0.04f); cvIRT.anchorMax = new Vector2(0.96f, 0.96f);
+        cvIRT.offsetMin = cvIRT.offsetMax = Vector2.zero;
+        cvInner.AddComponent<Image>().color = new Color(0.97f, 0.87f, 0.94f, 1f);
+
+        // Large colour swatch (circle)
+        var swatchGO = new GameObject("ColorSwatch"); swatchGO.transform.SetParent(cardVisualGO.transform, false);
+        var swatchRT = swatchGO.AddComponent<RectTransform>();
+        swatchRT.anchorMin = new Vector2(0.12f, 0.24f); swatchRT.anchorMax = new Vector2(0.88f, 0.88f);
+        swatchRT.offsetMin = swatchRT.offsetMax = Vector2.zero;
+        var swatchImg = swatchGO.AddComponent<Image>();
+        swatchImg.color = Color.red;
+        if (circleSprite != null) swatchImg.sprite = circleSprite;
+
+        // Shine on swatch
+        var swatchShine = new GameObject("Shine"); swatchShine.transform.SetParent(swatchGO.transform, false);
+        var ssRT = swatchShine.AddComponent<RectTransform>();
+        ssRT.anchorMin = new Vector2(0.14f, 0.56f); ssRT.anchorMax = new Vector2(0.86f, 0.86f);
+        ssRT.offsetMin = ssRT.offsetMax = Vector2.zero;
+        ssRT.localRotation = Quaternion.Euler(0, 0, -12f);
+        swatchShine.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.28f);
+
+        // Bottom label
+        var cvLblGO = new GameObject("CardLabel"); cvLblGO.transform.SetParent(cardVisualGO.transform, false);
+        var cvLblRT = cvLblGO.AddComponent<RectTransform>();
+        cvLblRT.anchorMin = new Vector2(0.05f, 0.03f); cvLblRT.anchorMax = new Vector2(0.95f, 0.22f);
+        cvLblRT.offsetMin = cvLblRT.offsetMax = Vector2.zero;
+        var cvLblTMP = cvLblGO.AddComponent<TextMeshProUGUI>();
+        cvLblTMP.text = "Move forward!"; cvLblTMP.fontSize = 26f;
+        cvLblTMP.fontStyle = FontStyles.Bold; cvLblTMP.alignment = TextAlignmentOptions.Center;
+        cvLblTMP.color = new Color(0.45f, 0.20f, 0.55f, 1f);
+        cardVisualGO.SetActive(false);
+        cardVisualGO.transform.SetAsLastSibling();
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━        //   PLAYER TOKEN PREFAB
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         EnsureFolder("Assets/ChasesJungleAdventure");
         var tokenGO = new GameObject("PlayerToken");
@@ -449,6 +494,8 @@ public static class JungleSceneBuilder
         soUI.FindProperty("winText").objectReferenceValue            = winTMP;
         soUI.FindProperty("playerCountText").objectReferenceValue    = playerCountTMP;
         soUI.FindProperty("inputHandler").objectReferenceValue       = bih;
+        soUI.FindProperty("cardVisual").objectReferenceValue         = cardVisualGO;
+        soUI.FindProperty("cardColorSwatch").objectReferenceValue    = swatchImg;
 
         var spProp = soUI.FindProperty("spacePositions");
         spProp.arraySize = 60;
@@ -598,52 +645,94 @@ public static class JungleSceneBuilder
 
     static void MakeTurnPad(GameObject parent, string name, Vector2 center)
     {
-        MakeTrailSegment(parent, name + "_Shadow", center, 106f, 106f, 0f, PathShadowColor, new Vector2(0, -7f));
-        MakeTrailSegment(parent, name + "_Base", center, 96f, 96f, 0f, PathBaseColor);
-        MakeTrailSegment(parent, name + "_Highlight", center + new Vector2(0, 3f), 74f, 38f, 0f, PathHighlightColor);
+        MakeTrailSegment(parent, name + "_Base", center, 90f, 90f, 0f, new Color(0.94f, 0.90f, 0.74f, 1f));
     }
 
-    static void BuildBoardSpaceVisual(GameObject space, Color fillColor, bool isSpecial)
+    static void MakeTurnCircle(GameObject parent, string name, Vector2 center, Sprite circle)
     {
-        var shadow = new GameObject("Shadow");
-        shadow.transform.SetParent(space.transform, false);
-        var shadowRt = shadow.AddComponent<RectTransform>();
-        shadowRt.anchorMin = Vector2.zero;
-        shadowRt.anchorMax = Vector2.one;
-        shadowRt.offsetMin = new Vector2(8f, -8f);
-        shadowRt.offsetMax = new Vector2(8f, -8f);
-        shadow.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.18f);
+        var go = new GameObject(name);
+        go.transform.SetParent(parent.transform, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = center;
+        rt.sizeDelta = new Vector2(88f, 88f);
+        var img = go.AddComponent<Image>();
+        img.color = new Color(0.94f, 0.90f, 0.74f, 1f);
+        if (circle != null) img.sprite = circle;
+    }
 
-        var ring = space.AddComponent<Image>();
-        ring.color = isSpecial ? new Color(0.26f, 0.20f, 0.05f, 1f) : new Color(0.22f, 0.16f, 0.04f, 0.92f);
+    /// <summary>Creates and saves a circle sprite to disk so it persists in the scene.</summary>
+    static Sprite GetOrCreateCircleSprite()
+    {
+        const string path = "Assets/ChasesJungleAdventure/JungleCircle.png";
+        // Re-use if already saved
+        var existing = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        if (existing != null) return existing;
 
+        const int size = 128;
+        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        var center = new Vector2(size / 2f, size / 2f);
+        float r = size / 2f - 1.5f;
+        for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), center);
+                tex.SetPixel(x, y, new Color(1f, 1f, 1f, Mathf.Clamp01(r - d + 1f)));
+            }
+        tex.Apply();
+        System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
+        AssetDatabase.Refresh();
+
+        var ti = AssetImporter.GetAtPath(path) as TextureImporter;
+        if (ti != null)
+        {
+            ti.textureType        = TextureImporterType.Sprite;
+            ti.spritePixelsPerUnit = size;
+            ti.filterMode         = FilterMode.Bilinear;
+            ti.SaveAndReimport();
+        }
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+    }
+
+    static void BuildBoardSpaceVisual(GameObject space, Color fillColor, bool isSpecial, Sprite circle)
+    {
+        // White border ring using circle sprite
+        var ringImg = space.AddComponent<Image>();
+        ringImg.color = Color.white;
+        if (circle != null) ringImg.sprite = circle;
+        ringImg.raycastTarget = false;
+
+        // Coloured face slightly inset
         var face = new GameObject("Face");
         face.transform.SetParent(space.transform, false);
         var faceRt = face.AddComponent<RectTransform>();
-        faceRt.anchorMin = new Vector2(0.10f, 0.10f);
-        faceRt.anchorMax = new Vector2(0.90f, 0.90f);
+        faceRt.anchorMin = new Vector2(0.12f, 0.12f);
+        faceRt.anchorMax = new Vector2(0.88f, 0.88f);
         faceRt.offsetMin = faceRt.offsetMax = Vector2.zero;
-        face.AddComponent<Image>().color = fillColor;
+        var faceImg = face.AddComponent<Image>();
+        faceImg.color = fillColor;
+        if (circle != null) faceImg.sprite = circle;
 
-        var shine = new GameObject("Shine");
-        shine.transform.SetParent(face.transform, false);
-        var shineRt = shine.AddComponent<RectTransform>();
-        shineRt.anchorMin = new Vector2(0.12f, 0.56f);
-        shineRt.anchorMax = new Vector2(0.88f, 0.84f);
-        shineRt.offsetMin = shineRt.offsetMax = Vector2.zero;
-        shineRt.localRotation = Quaternion.Euler(0, 0, -8f);
-        shine.AddComponent<Image>().color = new Color(1f, 1f, 1f, isSpecial ? 0.28f : 0.18f);
-
-        if (!isSpecial) return;
-
-        var glow = new GameObject("Glow");
-        glow.transform.SetParent(space.transform, false);
-        var glowRt = glow.AddComponent<RectTransform>();
-        glowRt.anchorMin = new Vector2(-0.08f, -0.08f);
-        glowRt.anchorMax = new Vector2(1.08f, 1.08f);
-        glowRt.offsetMin = glowRt.offsetMax = Vector2.zero;
-        glow.AddComponent<Image>().color = new Color(fillColor.r, fillColor.g, fillColor.b, 0.12f);
-        glow.transform.SetAsFirstSibling();
+        // Shine on non-specials; glow ring on specials
+        if (!isSpecial)
+        {
+            var shine = new GameObject("Shine"); shine.transform.SetParent(face.transform, false);
+            var sRT = shine.AddComponent<RectTransform>();
+            sRT.anchorMin = new Vector2(0.14f, 0.56f); sRT.anchorMax = new Vector2(0.86f, 0.84f);
+            sRT.offsetMin = sRT.offsetMax = Vector2.zero;
+            shine.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.18f);
+        }
+        else
+        {
+            var glow = new GameObject("Glow"); glow.transform.SetParent(space.transform, false);
+            var gRT = glow.AddComponent<RectTransform>();
+            gRT.anchorMin = new Vector2(-0.18f, -0.18f); gRT.anchorMax = new Vector2(1.18f, 1.18f);
+            gRT.offsetMin = gRT.offsetMax = Vector2.zero;
+            var glowImg = glow.AddComponent<Image>();
+            glowImg.color = new Color(fillColor.r, fillColor.g, fillColor.b, 0.25f);
+            if (circle != null) glowImg.sprite = circle;
+            glow.transform.SetAsFirstSibling();
+        }
     }
 
     /// <summary>Creates a TextMeshProUGUI. Call Anchor() afterwards to position it.</summary>
