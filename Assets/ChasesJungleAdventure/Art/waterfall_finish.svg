@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ee7ff"/><stop offset="1" stop-color="#d8f7ff"/></linearGradient>
+    <linearGradient id="fall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4f7ff"/><stop offset="1" stop-color="#58beff"/></linearGradient>
+  </defs>
+  <rect x="58" y="46" width="396" height="392" rx="46" fill="url(#sky)" opacity="0.95"/>
+  <path d="M90 390c20-90 46-160 90-206h152c42 38 72 104 90 206" fill="#4ea24e" stroke="#1a1a1a" stroke-width="6"/>
+  <path d="M178 166h152l-16 164H194z" fill="url(#fall)" stroke="#1a1a1a" stroke-width="6"/>
+  <ellipse cx="256" cy="346" rx="116" ry="52" fill="#44c5ff" stroke="#1a1a1a" stroke-width="6"/>
+  <ellipse cx="256" cy="350" rx="82" ry="20" fill="#8be4ff" opacity="0.8"/>
+  <path d="M110 152c42-70 250-88 304 0" fill="none" stroke="#ff5f8f" stroke-width="10"/>
+  <path d="M118 152c42-58 238-74 288 0" fill="none" stroke="#ff9a2a" stroke-width="10"/>
+  <path d="M126 152c42-46 226-60 272 0" fill="none" stroke="#ffe05f" stroke-width="10"/>
+  <path d="M134 152c42-34 214-46 256 0" fill="none" stroke="#52d66b" stroke-width="10"/>
+  <path d="M142 152c42-24 202-30 240 0" fill="none" stroke="#5ab0ff" stroke-width="10"/>
+  <g transform="translate(256 86)">
+    <polygon points="0,-30 10,-8 34,-8 14,6 22,30 0,16 -22,30 -14,6 -34,-8 -10,-8" fill="#ffd44a" stroke="#1a1a1a" stroke-width="5"/>
+  </g>
+  <g fill="#6ac761" stroke="#1a1a1a" stroke-width="6">
+    <path d="M76 370c22-56 44-70 82-74-18 30-20 52-10 88z"/>
+    <path d="M436 370c-22-56-44-70-82-74 18 30 20 52 10 88z"/>
+  </g>
+  <text x="256" y="470" text-anchor="middle" font-size="64" font-weight="900" font-family="Comic Sans MS, Baloo, Arial" fill="#ffd84c" stroke="#1a1a1a" stroke-width="6">FINISH!</text>
+</svg>

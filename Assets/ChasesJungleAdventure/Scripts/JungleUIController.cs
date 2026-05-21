@@ -127,8 +127,13 @@ public class JungleUIController : MonoBehaviour
         playerSetupPanel.SetActive(false);
         gameBoardPanel.SetActive(false);
         winPanel.SetActive(false);
+        SetContinueButtonVisible(hasSave);
+    }
+
+    public void SetContinueButtonVisible(bool isVisible)
+    {
         if (continueButton != null)
-            continueButton.gameObject.SetActive(hasSave);
+            continueButton.gameObject.SetActive(isVisible);
     }
 
     public void ShowPlayerSetupPanel(int playerCount, int maxPlayers)

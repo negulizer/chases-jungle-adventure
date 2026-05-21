@@ -46,22 +46,24 @@ public class GameManager : MonoBehaviour
 
     private async void Start()
     {
+        const bool hasSaveAtStartup = false;
+
+        // Show the welcome UI immediately so startup never blocks on save metadata lookup.
+        uiController.ShowWelcomePanel(hasSaveAtStartup);
+        uiController.OnNewGame      += StartPlayerSetup;
+        uiController.OnContinueGame += LoadAndContinue;
+
         // Check for an existing save so the welcome screen can show "Continue".
-        bool hasSave = false;
         try
         {
             var saves = await BoardSaveGameManager.GetSaveGamesMetadata();
             if (saves != null && saves.Length > 0)
             {
-                hasSave = true;
                 currentSaveId = saves[0].id;
+                uiController.SetContinueButtonVisible(true);
             }
         }
         catch { /* No saves or network unavailable — proceed without. */ }
-
-        uiController.ShowWelcomePanel(hasSave);
-        uiController.OnNewGame      += StartPlayerSetup;
-        uiController.OnContinueGame += LoadAndContinue;
     }
 
     // ── Player Setup ─────────────────────────────────────────────────────────
