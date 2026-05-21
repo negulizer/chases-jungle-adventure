@@ -14,12 +14,56 @@ using TMPro;
 /// </summary>
 public class JungleUIController : MonoBehaviour
 {
+
     // ── Panels ───────────────────────────────────────────────────────────────
     [Header("Panels")]
     public GameObject welcomePanel;
     public GameObject playerSetupPanel;
     public GameObject gameBoardPanel;
     public GameObject winPanel;
+
+    /// <summary>
+    /// Waits until a Board piece is detected on the given board space index.
+    /// Shows a prompt to the player.
+    /// </summary>
+    public IEnumerator WaitForPieceOnSpace(int spaceIndex)
+    {
+        // Show a prompt (reuse special message plate for now)
+        if (specialMessagePlate != null) specialMessagePlate.SetActive(true);
+        if (specialMessageText != null)
+        {
+            specialMessageText.text = $"Place your piece on space {spaceIndex + 1} to finish your move!";
+            specialMessageText.gameObject.SetActive(true);
+        }
+
+        bool placed = false;
+        while (!placed)
+        {
+            placed = BoardPieceOnSpace(spaceIndex);
+            yield return null;
+        }
+
+        // Hide prompt
+        if (specialMessagePlate != null) specialMessagePlate.SetActive(false);
+        if (specialMessageText != null) specialMessageText.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Returns true if any Board piece is detected on the given board space index.
+    /// </summary>
+    private bool BoardPieceOnSpace(int spaceIndex)
+    {
+        if (inputHandler == null || spacePositions == null || spaceIndex < 0 || spaceIndex >= spacePositions.Length)
+            return false;
+        var spacePos = spacePositions[spaceIndex].position;
+        foreach (var contact in Board.Input.BoardInput.GetActiveContacts(Board.Input.BoardContactType.Glyph))
+        {
+            // Check if the contact is close enough to the space position (screen space)
+            if (Vector2.Distance(contact.screenPosition, spacePos) < 60f) // 60px radius
+                return true;
+        }
+        return false;
+    }
 
     // ── Welcome Panel ─────────────────────────────────────────────────────────
     [Header("Welcome Buttons")]
