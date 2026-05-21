@@ -133,8 +133,25 @@ public class JungleUIController : MonoBehaviour
     /// <param name="steps">How many spaces the token will travel — shown so kids know what to count to.</param>
     public void ShowDrawnCard(CardSystem.Card card, int steps)
     {
-        // Show the colour-coded card visual
-        if (cardColorSwatch != null) cardColorSwatch.color = SpaceColorToRGB(card.color);
+        string moveText = $"Moving {steps} space{(steps == 1 ? "" : "s")}!";
+
+        if (card.kind == CardSystem.CardKind.Special)
+        {
+            if (cardColorSwatch != null)
+                cardColorSwatch.color = SpecialTypeToRGB(card.specialType);
+
+            if (cardDrawnText != null)
+                cardDrawnText.text = $"{SpecialTypeToEmoji(card.specialType)} {SpecialTypeToName(card.specialType)} card! {moveText}";
+        }
+        else
+        {
+            if (cardColorSwatch != null)
+                cardColorSwatch.color = SpaceColorToRGB(card.color);
+
+            if (cardDrawnText != null)
+                cardDrawnText.text = moveText;
+        }
+
         if (cardVisual != null)
         {
             cardVisual.SetActive(true);
@@ -142,8 +159,6 @@ public class JungleUIController : MonoBehaviour
             StopCoroutine("HideCardAfterDelay");
             StartCoroutine("HideCardAfterDelay");
         }
-        if (cardDrawnText != null)
-            cardDrawnText.text = $"Moving {steps} space{(steps == 1 ? "" : "s")}!";
     }
 
     private static Color SpaceColorToRGB(JungleBoard.SpaceColor c) => c switch
@@ -155,6 +170,36 @@ public class JungleUIController : MonoBehaviour
         JungleBoard.SpaceColor.Purple => new Color(0.65f, 0.15f, 0.95f),
         JungleBoard.SpaceColor.Orange => new Color(1.00f, 0.58f, 0.10f),
         _                             => Color.white
+    };
+
+    private static Color SpecialTypeToRGB(JungleBoard.SpecialType t) => t switch
+    {
+        JungleBoard.SpecialType.Spider    => new Color(0.33f, 0.33f, 0.36f),
+        JungleBoard.SpecialType.Snake     => new Color(0.35f, 0.72f, 0.23f),
+        JungleBoard.SpecialType.Monkey    => new Color(0.72f, 0.45f, 0.25f),
+        JungleBoard.SpecialType.Alligator => new Color(0.18f, 0.62f, 0.40f),
+        JungleBoard.SpecialType.Raft      => new Color(0.16f, 0.72f, 0.86f),
+        _                                 => Color.white
+    };
+
+    private static string SpecialTypeToEmoji(JungleBoard.SpecialType t) => t switch
+    {
+        JungleBoard.SpecialType.Spider    => "🕷",
+        JungleBoard.SpecialType.Snake     => "🐍",
+        JungleBoard.SpecialType.Monkey    => "🐒",
+        JungleBoard.SpecialType.Alligator => "🐊",
+        JungleBoard.SpecialType.Raft      => "🛶",
+        _                                 => ""
+    };
+
+    private static string SpecialTypeToName(JungleBoard.SpecialType t) => t switch
+    {
+        JungleBoard.SpecialType.Spider    => "Spider",
+        JungleBoard.SpecialType.Snake     => "Snake",
+        JungleBoard.SpecialType.Monkey    => "Monkey",
+        JungleBoard.SpecialType.Alligator => "Gator",
+        JungleBoard.SpecialType.Raft      => "Raft",
+        _                                 => ""
     };
 
     private IEnumerator HideCardAfterDelay()

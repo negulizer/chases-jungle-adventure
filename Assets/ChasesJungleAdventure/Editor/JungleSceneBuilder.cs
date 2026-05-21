@@ -186,12 +186,12 @@ public static class JungleSceneBuilder
         Anchor(cardDrawnTMP.gameObject, new Vector2(0.03f, 0.82f), new Vector2(0.97f, 0.90f));
         cardDrawnTMP.fontStyle = FontStyles.Bold;
 
-        // Big counting number — center overlay, hidden except during movement
-        var countingPlate = MakeRoundedPlate(boardPanel, "CountingPlate", new Vector2(0.5f, 0.50f), new Vector2(340f, 260f), new Color(0.05f, 0.11f, 0.06f, 0.68f), -4f);
+        // Big counting number — left of the card popup so they never overlap
+        var countingPlate = MakeRoundedPlate(boardPanel, "CountingPlate", new Vector2(0.37f, 0.53f), new Vector2(300f, 240f), new Color(0.05f, 0.11f, 0.06f, 0.68f), -4f);
         countingPlate.SetActive(false);
         countingPlate.transform.SetAsLastSibling();
         var countingTMP = MakeTMP(boardPanel, "CountingText", "", 130f, Color.white);
-        Anchor(countingTMP.gameObject, new Vector2(0.35f, 0.38f), new Vector2(0.65f, 0.62f));
+        Anchor(countingTMP.gameObject, new Vector2(0.28f, 0.40f), new Vector2(0.46f, 0.66f));
         countingTMP.fontStyle = FontStyles.Bold;
         countingTMP.gameObject.SetActive(false);
         countingTMP.characterSpacing = 10f;
@@ -261,14 +261,14 @@ public static class JungleSceneBuilder
         foreach (int idx in turnSpaces)
             MakeTurnCircle(boardSpacesGO, $"TurnPad_{idx:D2}", spacePts[idx], circleSprite);
 
-        // Special-space labels (emoji + short name so they're recognisable at a glance)
+        // Special-space labels (icon-only, no text words)
         var labels = new string[60];
         labels[0]  = "START";
-        labels[7]  = "\U0001F577\nSPIDER";
-        labels[15] = "\U0001F40D\nSNAKE";
-        labels[22] = "\U0001F412\nMONKEY";
-        labels[35] = "\U0001F40A\nGATOR";
-        labels[40] = "\U0001F6F6\nRAFT";
+        labels[7]  = "\U0001F577";
+        labels[15] = "\U0001F40D";
+        labels[22] = "\U0001F412";
+        labels[35] = "\U0001F40A";
+        labels[40] = "\U0001F6F6";
         labels[59] = "\U0001F3C6\nWIN!";
 
         var spaceRTs = new RectTransform[60];
@@ -292,32 +292,18 @@ public static class JungleSceneBuilder
 
             BuildBoardSpaceVisual(spGO, col, isSpecial, circleSprite);
 
-            // Small space-number label (bottom half of the square)
-            var numGO  = new GameObject("Num");
-            numGO.transform.SetParent(spGO.transform, false);
-            var nrt    = numGO.AddComponent<RectTransform>();
-            nrt.anchorMin = new Vector2(0.08f, 0.02f);
-            nrt.anchorMax = new Vector2(0.92f, 0.38f);
-            nrt.offsetMin = nrt.offsetMax = Vector2.zero;
-            var numTMP = numGO.AddComponent<TextMeshProUGUI>();
-            numTMP.text      = i.ToString();
-            numTMP.fontSize  = isSpecial ? 16f : 13f;
-            numTMP.fontStyle = FontStyles.Bold;
-            numTMP.color     = new Color(0.16f, 0.10f, 0.02f, 0.80f);
-            numTMP.alignment = TextAlignmentOptions.Bottom;
-
             // Named label (top half, special spaces only)
             if (labels[i] != null)
             {
                 var lblGO = new GameObject("Label");
                 lblGO.transform.SetParent(spGO.transform, false);
                 var lrt   = lblGO.AddComponent<RectTransform>();
-                lrt.anchorMin = new Vector2(-0.1f, isSpecial ? 0.32f : 0.38f);
-                lrt.anchorMax = new Vector2(1.1f, 0.92f);
+                lrt.anchorMin = new Vector2(-0.1f, isSpecial ? 0.18f : 0.38f);
+                lrt.anchorMax = new Vector2(1.1f, 0.86f);
                 lrt.offsetMin = lrt.offsetMax = Vector2.zero;
                 var lbl   = lblGO.AddComponent<TextMeshProUGUI>();
                 lbl.text      = labels[i];
-                lbl.fontSize  = isSpecial ? 14f : 11f;
+                lbl.fontSize  = isSpecial ? 44f : 11f;
                 lbl.fontStyle = FontStyles.Bold;
                 lbl.alignment = TextAlignmentOptions.Center;
                 lbl.color     = Color.white;
@@ -350,7 +336,7 @@ public static class JungleSceneBuilder
         var cvRT = cardVisualGO.AddComponent<RectTransform>();
         cvRT.anchorMin = cvRT.anchorMax = new Vector2(0.5f, 0.5f);
         cvRT.sizeDelta = new Vector2(280f, 370f);
-        cvRT.anchoredPosition = new Vector2(0f, 50f);
+        cvRT.anchoredPosition = new Vector2(320f, 40f);
         var cvBg = cardVisualGO.AddComponent<Image>();
         cvBg.color = new Color(0.98f, 0.96f, 0.97f, 1f);
 

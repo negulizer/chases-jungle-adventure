@@ -140,15 +140,31 @@ public class GameManager : MonoBehaviour
             // Wait for the player to tap "Draw Card" or place a physical piece.
             yield return uiController.WaitForDrawCard();
 
-            var card  = cardSystem.DrawCard();
-            int steps = jungleBoard.GetStepsToNextColor(player.position, card.color);
+            var card = cardSystem.DrawCard();
+            int targetIndex;
+
+            if (card.kind == CardSystem.CardKind.Special)
+            {
+                // Character card: move directly to that board space.
+                int specialIndex = jungleBoard.GetSpecialSpaceIndex(card.specialType);
+                targetIndex = specialIndex >= 0 ? specialIndex : player.position;
+            }
+            else
+            {
+                int stepsToColor = jungleBoard.GetStepsToNextColor(player.position, card.color);
+                targetIndex = Mathf.Clamp(player.position + stepsToColor, 0, jungleBoard.GoalIndex);
+            }
+
+            int steps = Mathf.Abs(targetIndex - player.position);
             uiController.ShowDrawnCard(card, steps);
             yield return new WaitForSeconds(1.0f);
 
-            yield return MovePlayer(player, steps);
+            yield return MovePlayerToIndex(player, targetIndex);
             uiController.HideCountingDisplay();
 
-            if (jungleBoard.IsSpecialSpace(player.position, out var special))
+            // Only resolve board special effects after normal color movement.
+            if (card.kind == CardSystem.CardKind.Color &&
+                jungleBoard.IsSpecialSpace(player.position, out var special))
                 yield return HandleSpecialSpace(player, special);
 
             if (player.position >= jungleBoard.GoalIndex)
@@ -164,13 +180,18 @@ public class GameManager : MonoBehaviour
     }
 
     // Step the token one space at a time so kids can count along.
-    private IEnumerator MovePlayer(PlayerToken player, int steps)
+    private IEnumerator MovePlayerToIndex(PlayerToken player, int targetIndex)
     {
-        for (int i = 1; i <= steps && player.position < jungleBoard.GoalIndex; i++)
+        targetIndex = Mathf.Clamp(targetIndex, 0, jungleBoard.GoalIndex);
+        int totalSteps = Mathf.Abs(targetIndex - player.position);
+        if (totalSteps == 0) yield break;
+
+        int direction = targetIndex > player.position ? 1 : -1;
+        for (int i = 1; i <= totalSteps; i++)
         {
-            player.position++;
+            player.position += direction;
             uiController.MoveToken(player, player.position);
-            uiController.ShowCountingNumber(i, steps);
+            uiController.ShowCountingNumber(i, totalSteps);
             yield return new WaitForSeconds(stepDelay);
         }
     }

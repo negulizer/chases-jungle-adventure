@@ -55,4 +55,12 @@ public class JungleBoard : MonoBehaviour
         special = specialSpaces[index];
         return special.type != SpecialType.None;
     }
+
+    public int GetSpecialSpaceIndex(SpecialType type)
+    {
+        for (int i = 0; i < specialSpaces.Length; i++)
+            if (specialSpaces[i].type == type)
+                return i;
+        return -1;
+    }
 }
