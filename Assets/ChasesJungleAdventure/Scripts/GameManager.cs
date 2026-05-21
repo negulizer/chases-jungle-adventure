@@ -159,8 +159,12 @@ public class GameManager : MonoBehaviour
             uiController.ShowDrawnCard(card, steps);
             yield return new WaitForSeconds(1.0f);
 
+
             yield return MovePlayerToIndex(player, targetIndex);
             uiController.HideCountingDisplay();
+
+            // Require physical piece placement on the correct space before ending turn
+            yield return uiController.WaitForPieceOnSpace(player.position);
 
             // Only resolve board special effects after normal color movement.
             if (card.kind == CardSystem.CardKind.Color &&

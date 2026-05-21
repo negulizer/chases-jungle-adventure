@@ -808,54 +808,341 @@ public static class JungleSceneBuilder
         zRT.anchoredPosition = Vector2.zero;
         z.transform.SetAsFirstSibling();  // render behind trail and spaces
 
-        // ── Spider Swamp (space 7) — dark purple web ─────────────────────────
-        MakeZoneCircle(z, "SpiderSwampBg", pts[7], 210f, new Color(0.10f, 0.04f, 0.22f, 0.58f), circle);
-        MakeZoneCircle(z, "WebRing1",      pts[7],  88f, new Color(0.58f, 0.55f, 0.72f, 0.28f), circle);
-        MakeZoneCircle(z, "WebRing2",      pts[7], 148f, new Color(0.58f, 0.55f, 0.72f, 0.18f), circle);
+        // ── Zone Background Glows ────────────────────────────────────────────
+
+        // Spider Swamp (space 7) — dark purple glow + web pattern
+        MakeZoneCircle(z, "SpiderSwampBg", pts[7], 240f, new Color(0.08f, 0.02f, 0.20f, 0.65f), circle);
         for (int i = 0; i < 8; i++)
-            MakeZoneRect(z, $"WebStrand{i}", pts[7], new Vector2(185f, 3f), i * 22.5f,
-                new Color(0.58f, 0.55f, 0.72f, 0.36f));
+            MakeZoneRect(z, $"WebStrand{i}", pts[7], new Vector2(210f, 3f), i * 22.5f,
+                new Color(0.60f, 0.55f, 0.76f, 0.28f));
+        MakeZoneCircle(z, "WebRing1", pts[7],  82f, new Color(0.60f, 0.55f, 0.76f, 0.22f), circle);
+        MakeZoneCircle(z, "WebRing2", pts[7], 144f, new Color(0.60f, 0.55f, 0.76f, 0.15f), circle);
+        MakeZoneCircle(z, "WebRing3", pts[7], 200f, new Color(0.60f, 0.55f, 0.76f, 0.10f), circle);
 
-        // ── Swamp / grass around Snake (space 15) ────────────────────────────
-        MakeZoneCircle(z, "SnakeSwampBg", pts[15], 185f, new Color(0.06f, 0.32f, 0.06f, 0.50f), circle);
-        for (int i = 0; i < 9; i++)
+        // Snake swamp (space 15) — dark green + grass tufts
+        MakeZoneCircle(z, "SnakeSwampBg", pts[15], 215f, new Color(0.05f, 0.26f, 0.05f, 0.58f), circle);
+        for (int i = 0; i < 10; i++)
         {
-            float gx  = Mathf.Lerp(-80f, 80f, i / 8f);
-            float gh  = 26f + (i % 3) * 10f;
-            MakeZoneRect(z, $"Grass{i}", pts[15] + new Vector2(gx, gh * 0.38f),
-                new Vector2(5f, gh), -10f + i * 5.5f, new Color(0.10f, 0.75f, 0.12f, 0.80f));
+            float gx = Mathf.Lerp(-95f, 95f, i / 9f);
+            float gh = 28f + (i % 3) * 12f;
+            MakeZoneRect(z, $"Grass{i}", pts[15] + new Vector2(gx, gh * 0.34f),
+                new Vector2(5f, gh), -12f + i * 6f, new Color(0.10f, 0.80f, 0.12f, 0.76f));
         }
 
-        // ── Monkey Canopy (space 22) — dark-green with hanging vines ─────────
-        MakeZoneCircle(z, "CanopyBg", pts[22], 220f, new Color(0.04f, 0.44f, 0.06f, 0.54f), circle);
-        for (int v = 0; v < 8; v++)
+        // Monkey canopy (space 22) — dense green + hanging vines
+        MakeZoneCircle(z, "CanopyBg", pts[22], 250f, new Color(0.04f, 0.38f, 0.06f, 0.60f), circle);
+        for (int v = 0; v < 9; v++)
         {
-            float vx  = Mathf.Lerp(-90f, 90f, v / 7f);
-            float vLen = 48f + (v % 2 == 0 ? 22f : 0f);
-            // Vine stem
-            MakeZoneRect(z, $"Vine{v}",      pts[22] + new Vector2(vx,  vLen * 0.32f),
-                new Vector2(5f, vLen), (v % 3 - 1) * 7f, new Color(0.14f, 0.64f, 0.10f, 0.84f));
-            // Leaf at vine tip
-            MakeZoneCircle(z, $"VineLeaf{v}", pts[22] + new Vector2(vx, -vLen * 0.10f),
-                16f, new Color(0.08f, 0.82f, 0.12f, 0.90f), circle);
+            float vx   = Mathf.Lerp(-105f, 105f, v / 8f);
+            float vLen = 58f + (v % 2 == 0 ? 26f : 0f);
+            MakeZoneRect(z, $"VineStem{v}", pts[22] + new Vector2(vx, vLen * 0.30f),
+                new Vector2(5f, vLen), (v % 3 - 1) * 8f, new Color(0.16f, 0.62f, 0.10f, 0.84f));
+            MakeZoneCircle(z, $"VineLeaf{v}", pts[22] + new Vector2(vx, -vLen * 0.08f),
+                18f, new Color(0.08f, 0.88f, 0.14f, 0.90f), circle);
         }
 
-        // ── River band connecting alligator → raft (spaces 33–41) ────────────
+        // River zone (spaces 33–41) — blue pools + river band
         for (int s = 33; s <= 41 && s < pts.Length; s++)
-            MakeZoneCircle(z, $"RiverPool{s}", pts[s], 82f,
-                new Color(0.06f, 0.40f, 0.92f, 0.38f), circle);
-
-        if (40 < pts.Length)
+            MakeZoneCircle(z, $"RiverPool{s}", pts[s], 92f,
+                new Color(0.05f, 0.36f, 0.95f, 0.42f), circle);
+        if (41 < pts.Length)
         {
-            Vector2 mid   = (pts[35] + pts[40]) * 0.5f;
-            float   dist  = (pts[40] - pts[35]).magnitude;
-            float   ang   = Mathf.Atan2(pts[40].y - pts[35].y,
-                                        pts[40].x - pts[35].x) * Mathf.Rad2Deg;
-            MakeZoneRect(z, "RiverBand",  mid, new Vector2(dist + 55f, 88f), ang,
-                new Color(0.06f, 0.40f, 0.92f, 0.44f));
-            MakeZoneRect(z, "RiverShine", mid, new Vector2(dist + 55f, 30f), ang,
-                new Color(0.40f, 0.78f, 1.00f, 0.28f));
+            Vector2 mid  = (pts[33] + pts[41]) * 0.5f;
+            float   dist = (pts[41] - pts[33]).magnitude;
+            float   ang  = Mathf.Atan2(pts[41].y - pts[33].y,
+                                       pts[41].x - pts[33].x) * Mathf.Rad2Deg;
+            MakeZoneRect(z, "RiverBand",  mid, new Vector2(dist + 65f, 98f),  ang,
+                new Color(0.05f, 0.36f, 0.95f, 0.48f));
+            MakeZoneRect(z, "RiverShine", mid, new Vector2(dist + 65f, 34f), ang,
+                new Color(0.46f, 0.82f, 1.00f, 0.28f));
         }
+
+        // ── Animal Characters (drawn above their backgrounds) ─────────────────
+        // Each animal is centered 65px above its space so the head clears the space dot.
+        DrawSpider   (z, pts[7]  + new Vector2(  0f, 62f), circle);
+        DrawSnake    (z, pts[15] + new Vector2(  8f, 62f), circle);
+        DrawMonkey   (z, pts[22] + new Vector2(  0f, 58f), circle);
+        DrawAlligator(z, pts[35] + new Vector2(  0f, 58f), circle);
+    }
+
+    // ── Spider ───────────────────────────────────────────────────────────────
+    static void DrawSpider(GameObject p, Vector2 c, Sprite o)
+    {
+        Color purpleDk = new Color(0.12f, 0.03f, 0.26f);
+        Color purpleMd = new Color(0.20f, 0.06f, 0.38f);
+        Color orange   = new Color(1.00f, 0.54f, 0.04f);
+        Color crimson  = new Color(0.90f, 0.06f, 0.06f);
+        Color ivory    = new Color(0.90f, 0.88f, 0.82f);
+
+        // Shadow
+        MakeZoneCircle(p, "SpiderShadow", c + new Vector2(2f, -62f), 64f, new Color(0,0,0,0.18f), o);
+
+        // Legs — upper + lower segments, 4 on each side
+        float[] legRootY = {  8f, -2f, -12f, -22f };
+        float[] angL     = { 52f, 72f, 102f, 128f };
+        float[] angR     = {-52f,-72f,-102f,-128f };
+        for (int i = 0; i < 4; i++)
+        {
+            float   ry = legRootY[i];
+            Vector2 eL = c + new Vector2(-46f - i * 4f, ry - 10f);
+            Vector2 eR = c + new Vector2( 46f + i * 4f, ry - 10f);
+            MakeZoneRect(p, $"LLUp{i}",   c + new Vector2(-15f, ry), new Vector2(34f, 5f), angL[i],        purpleDk);
+            MakeZoneRect(p, $"LLDn{i}",   eL + new Vector2(-12f,-6f), new Vector2(30f, 4f), angL[i] + 38f, purpleMd);
+            MakeZoneRect(p, $"LRUp{i}",   c + new Vector2( 15f, ry), new Vector2(34f, 5f), angR[i],        purpleDk);
+            MakeZoneRect(p, $"LRDn{i}",   eR + new Vector2( 12f,-6f), new Vector2(30f, 4f), angR[i] - 38f, purpleMd);
+        }
+
+        // Abdomen (large lower body)
+        MakeZoneCircle(p, "Abdomen",    c + new Vector2(0f,-26f), 56f, purpleDk, o);
+        // Hourglass danger marking
+        MakeZoneCircle(p, "HGlassTop",  c + new Vector2(0f,-18f), 14f, orange,   o);
+        MakeZoneCircle(p, "HGlassBot",  c + new Vector2(0f,-36f), 10f, orange,   o);
+        MakeZoneRect(p,   "HGlassLink", c + new Vector2(0f,-27f), new Vector2(5f, 18f), 0f, new Color(orange.r,orange.g,orange.b,0.55f));
+
+        // Thorax
+        MakeZoneCircle(p, "Thorax", c + new Vector2(0f,  6f), 32f, purpleDk, o);
+        // Cephalothorax / head
+        MakeZoneCircle(p, "Head",   c + new Vector2(0f, 22f), 28f, purpleMd, o);
+
+        // Eight eyes (two rows of four)
+        float[] ex = {-11f, -4f,  4f, 11f };
+        float[] ey = { 28f, 34f, 34f, 28f };
+        float[] er = {  7f,  6f,  6f,  7f };
+        for (int e = 0; e < 4; e++)
+            MakeZoneCircle(p, $"Eye{e}", c + new Vector2(ex[e], ey[e]), er[e], crimson, o);
+        for (int e = 0; e < 4; e++)
+            MakeZoneCircle(p, $"Eye{e+4}", c + new Vector2(ex[e], ey[e] + 6f), er[e] - 1f, crimson, o);
+
+        // Fangs
+        MakeZoneCircle(p, "FangBaseL", c + new Vector2(-7f, 14f), 8f, purpleMd, o);
+        MakeZoneCircle(p, "FangBaseR", c + new Vector2( 7f, 14f), 8f, purpleMd, o);
+        MakeZoneRect(p,  "FangL",      c + new Vector2(-8f,  5f), new Vector2(5f, 13f), -10f, ivory);
+        MakeZoneRect(p,  "FangR",      c + new Vector2( 8f,  5f), new Vector2(5f, 13f),  10f, ivory);
+        // Venom drops
+        MakeZoneCircle(p, "VenomL", c + new Vector2(-8f, -1f), 5f, new Color(0.36f, 0.92f, 0.28f, 0.92f), o);
+        MakeZoneCircle(p, "VenomR", c + new Vector2( 8f, -1f), 5f, new Color(0.36f, 0.92f, 0.28f, 0.92f), o);
+    }
+
+    // ── Snake ────────────────────────────────────────────────────────────────
+    static void DrawSnake(GameObject p, Vector2 c, Sprite o)
+    {
+        Color snkGrn = new Color(0.10f, 0.72f, 0.14f);
+        Color snkDrk = new Color(0.06f, 0.48f, 0.08f);
+        Color belly  = new Color(0.84f, 0.92f, 0.56f);
+        Color eyeYel = new Color(1.00f, 0.80f, 0.04f);
+        Color tongue = new Color(0.92f, 0.08f, 0.10f);
+
+        // Bottom coil
+        MakeZoneRect(p, "CoilBot",      c + new Vector2(0f,-48f), new Vector2(94f, 36f), 0f, snkGrn);
+        MakeZoneRect(p, "CoilBotBelly", c + new Vector2(0f,-48f), new Vector2(58f, 36f), 0f, belly);
+        // Scale diamonds on bottom coil
+        for (int d = 0; d < 7; d++)
+        {
+            float dx = Mathf.Lerp(-38f, 38f, d / 6f);
+            MakeZoneRect(p, $"BScale{d}", c + new Vector2(dx, -42f + (d%2)*14f), new Vector2(12f,12f), 45f, snkDrk);
+        }
+        // Rattle tail (right end)
+        MakeZoneRect(p, "Rattle1", c + new Vector2( 48f,-48f), new Vector2(18f,14f), 0f, new Color(0.64f,0.52f,0.20f));
+        MakeZoneRect(p, "Rattle2", c + new Vector2( 60f,-48f), new Vector2(14f,11f), 0f, new Color(0.52f,0.42f,0.16f));
+        MakeZoneRect(p, "Rattle3", c + new Vector2( 70f,-48f), new Vector2(10f, 9f), 0f, new Color(0.42f,0.34f,0.12f));
+
+        // Middle coil
+        MakeZoneRect(p, "CoilMid",      c + new Vector2(0f,-14f), new Vector2(82f, 32f), 0f, snkGrn);
+        MakeZoneRect(p, "CoilMidBelly", c + new Vector2(0f,-14f), new Vector2(48f, 32f), 0f, belly);
+
+        // Neck rising from left
+        MakeZoneRect(p, "Neck",      c + new Vector2(-10f, 12f), new Vector2(26f, 38f), 14f, snkGrn);
+        MakeZoneRect(p, "NeckBelly", c + new Vector2( -8f, 12f), new Vector2(14f, 38f), 14f, belly);
+
+        // Cobra hood (flared head fan)
+        MakeZoneCircle(p, "Hood",      c + new Vector2(-18f, 48f), 54f, snkGrn, o);
+        MakeZoneCircle(p, "HoodInner", c + new Vector2(-18f, 48f), 40f, new Color(snkGrn.r, snkGrn.g, snkGrn.b, 0.55f), o);
+        MakeZoneRect(p,  "HoodPatL",   c + new Vector2(-26f, 44f), new Vector2(9f, 26f),  19f, snkDrk);
+        MakeZoneRect(p,  "HoodPatR",   c + new Vector2(-12f, 44f), new Vector2(9f, 26f), -19f, snkDrk);
+
+        // Head
+        MakeZoneCircle(p, "SnkHead", c + new Vector2(-20f, 56f), 34f, snkGrn, o);
+        MakeZoneCircle(p, "SnkFace", c + new Vector2(-22f, 52f), 24f, belly,   o);
+
+        // Eyes (golden with vertical slit pupils)
+        MakeZoneCircle(p, "EyeL",  c + new Vector2(-29f, 60f), 9f, eyeYel, o);
+        MakeZoneCircle(p, "EyeR",  c + new Vector2(-12f, 60f), 9f, eyeYel, o);
+        MakeZoneRect(p,  "SlitL",  c + new Vector2(-29f, 60f), new Vector2(3f, 10f), 0f, new Color(0.04f,0.04f,0.04f));
+        MakeZoneRect(p,  "SlitR",  c + new Vector2(-12f, 60f), new Vector2(3f, 10f), 0f, new Color(0.04f,0.04f,0.04f));
+
+        // Forked tongue
+        MakeZoneRect(p, "TongueStem", c + new Vector2(-32f, 44f), new Vector2(4f, 16f), -16f, tongue);
+        MakeZoneRect(p, "ForkL",      c + new Vector2(-38f, 34f), new Vector2(3f, 10f), -34f, tongue);
+        MakeZoneRect(p, "ForkR",      c + new Vector2(-28f, 34f), new Vector2(3f, 10f),   6f, tongue);
+    }
+
+    // ── Monkey ───────────────────────────────────────────────────────────────
+    static void DrawMonkey(GameObject p, Vector2 c, Sprite o)
+    {
+        Color furDk  = new Color(0.36f, 0.20f, 0.04f);
+        Color furLt  = new Color(0.50f, 0.30f, 0.08f);
+        Color face   = new Color(0.84f, 0.62f, 0.38f);
+        Color drk    = new Color(0.22f, 0.10f, 0.02f);
+        Color banana = new Color(1.00f, 0.88f, 0.06f);
+
+        // Curling tail (arc of decreasing circles)
+        float[] tx = { 32f, 52f, 68f, 76f, 72f, 60f, 46f, 36f };
+        float[] ty = {-50f,-52f,-42f,-26f,-10f,  2f,  8f,  5f };
+        float[] tr = { 13f, 12f, 11f, 10f,  9f,  9f,  8f,  7f };
+        for (int t = 0; t < 8; t++)
+            MakeZoneCircle(p, $"Tail{t}", c + new Vector2(tx[t], ty[t]), tr[t], furDk, o);
+
+        // Legs
+        MakeZoneRect(p, "LegL",  c + new Vector2(-20f,-50f), new Vector2(22f, 40f),  8f, furDk);
+        MakeZoneRect(p, "LegR",  c + new Vector2( 20f,-50f), new Vector2(22f, 40f), -8f, furDk);
+        MakeZoneCircle(p, "FootL", c + new Vector2(-24f,-68f), 16f, furDk, o);
+        MakeZoneCircle(p, "FootR", c + new Vector2( 24f,-68f), 16f, furDk, o);
+        // Toes
+        for (int t = 0; t < 3; t++)
+        {
+            MakeZoneCircle(p, $"ToeLL{t}", c + new Vector2(-30f + t * 6f, -76f), 5f, furLt, o);
+            MakeZoneCircle(p, $"ToeRL{t}", c + new Vector2( -6f + t * 6f, -76f), 5f, furLt, o);
+        }
+
+        // Body + belly
+        MakeZoneCircle(p, "Body",  c + new Vector2(0f,-16f), 58f, furDk, o);
+        MakeZoneCircle(p, "Belly", c + new Vector2(0f,-18f), 36f, face,   o);
+
+        // Arms
+        MakeZoneRect(p, "ArmL",  c + new Vector2(-44f,-14f), new Vector2(18f, 50f), -22f, furDk);
+        MakeZoneRect(p, "ArmR",  c + new Vector2( 44f,-14f), new Vector2(18f, 50f),  22f, furDk);
+        MakeZoneCircle(p, "HandL", c + new Vector2(-56f,-36f), 14f, face, o);
+        MakeZoneCircle(p, "HandR", c + new Vector2( 56f,-36f), 14f, face, o);
+
+        // Banana in right hand
+        MakeZoneRect(p, "BananaStem", c + new Vector2( 66f,-42f), new Vector2( 5f, 10f),  0f, drk);
+        MakeZoneRect(p, "BananaBody", c + new Vector2( 68f,-54f), new Vector2( 9f, 28f), 18f, banana);
+        MakeZoneRect(p, "BananaEnd",  c + new Vector2( 73f,-64f), new Vector2( 7f,  9f), 36f, new Color(0.80f,0.68f,0.04f));
+
+        // Head
+        MakeZoneCircle(p, "Head",     c + new Vector2(0f, 26f), 50f, furDk,  o);
+        MakeZoneCircle(p, "EarL",     c + new Vector2(-38f, 24f), 18f, furDk,  o);
+        MakeZoneCircle(p, "EarLInr",  c + new Vector2(-38f, 24f), 10f, face,   o);
+        MakeZoneCircle(p, "EarR",     c + new Vector2( 38f, 24f), 18f, furDk,  o);
+        MakeZoneCircle(p, "EarRInr",  c + new Vector2( 38f, 24f), 10f, face,   o);
+        MakeZoneCircle(p, "FacePlate",c + new Vector2(0f, 20f), 34f, face,   o);
+
+        // Eyes + pupils + shine
+        MakeZoneCircle(p, "EyeL",   c + new Vector2(-12f, 28f), 10f, drk,      o);
+        MakeZoneCircle(p, "EyeR",   c + new Vector2( 12f, 28f), 10f, drk,      o);
+        MakeZoneCircle(p, "PupilL", c + new Vector2(-12f, 27f),  5f, Color.black, o);
+        MakeZoneCircle(p, "PupilR", c + new Vector2( 12f, 27f),  5f, Color.black, o);
+        MakeZoneCircle(p, "ShineL", c + new Vector2(-10f, 29f),  2f, Color.white, o);
+        MakeZoneCircle(p, "ShineR", c + new Vector2( 14f, 29f),  2f, Color.white, o);
+
+        // Muzzle + nostrils + smile
+        MakeZoneCircle(p, "Muzzle",   c + new Vector2(0f, 12f), 20f, face, o);
+        MakeZoneCircle(p, "NostrilL", c + new Vector2(-5f,14f),  4f, drk,  o);
+        MakeZoneCircle(p, "NostrilR", c + new Vector2( 5f,14f),  4f, drk,  o);
+        MakeZoneRect(p,  "Smile",     c + new Vector2(0f,  6f), new Vector2(18f,4f), 0f, drk);
+
+        // Friendly brows + hair tuft
+        MakeZoneRect(p, "BrowL",    c + new Vector2(-12f,34f), new Vector2(14f,4f), -8f, drk);
+        MakeZoneRect(p, "BrowR",    c + new Vector2( 12f,34f), new Vector2(14f,4f),  8f, drk);
+        MakeZoneCircle(p, "Tuft1",  c + new Vector2(-6f,50f), 12f, furDk, o);
+        MakeZoneCircle(p, "Tuft2",  c + new Vector2( 0f,54f), 13f, furDk, o);
+        MakeZoneCircle(p, "Tuft3",  c + new Vector2( 6f,50f), 12f, furDk, o);
+    }
+
+    // ── Alligator Warrior ────────────────────────────────────────────────────
+    static void DrawAlligator(GameObject p, Vector2 c, Sprite o)
+    {
+        Color gGrn   = new Color(0.12f, 0.62f, 0.14f);
+        Color gDrk   = new Color(0.07f, 0.42f, 0.09f);
+        Color armor  = new Color(0.50f, 0.52f, 0.58f);
+        Color arDk   = new Color(0.36f, 0.38f, 0.44f);
+        Color wood   = new Color(0.52f, 0.30f, 0.10f);
+        Color wdDk   = new Color(0.36f, 0.20f, 0.06f);
+
+        // Shadow
+        MakeZoneCircle(p, "GatorShadow", c + new Vector2(2f,-82f), 88f, new Color(0,0,0,0.20f), o);
+
+        // Tail
+        MakeZoneRect(p, "TailBase", c + new Vector2(  6f,-72f), new Vector2(18f,20f),  0f, gGrn);
+        MakeZoneRect(p, "TailMid",  c + new Vector2( 20f,-80f), new Vector2(14f,18f), 26f, gGrn);
+        MakeZoneRect(p, "TailTip",  c + new Vector2( 33f,-88f), new Vector2(10f,14f), 46f, gGrn);
+
+        // Legs
+        MakeZoneRect(p, "LegL",    c + new Vector2(-22f,-50f), new Vector2(24f,46f),  0f, gGrn);
+        MakeZoneRect(p, "LegR",    c + new Vector2( 22f,-50f), new Vector2(24f,46f),  0f, gGrn);
+        MakeZoneRect(p, "BootL",   c + new Vector2(-22f,-74f), new Vector2(28f,20f),  0f, armor);
+        MakeZoneRect(p, "BootR",   c + new Vector2( 22f,-74f), new Vector2(28f,20f),  0f, armor);
+        MakeZoneRect(p, "BandL",   c + new Vector2(-22f,-64f), new Vector2(30f, 6f),  0f, arDk);
+        MakeZoneRect(p, "BandR",   c + new Vector2( 22f,-64f), new Vector2(30f, 6f),  0f, arDk);
+
+        // Body (green) + chest armour
+        MakeZoneCircle(p, "GatorBody",  c + new Vector2(0f,-22f), 68f, gGrn,  o);
+        MakeZoneCircle(p, "ChestArmor", c + new Vector2(0f,-18f), 56f, armor,  o);
+        MakeZoneCircle(p, "ChestInner", c + new Vector2(0f,-18f), 34f, arDk,   o);
+        // Rivets on chest plate
+        MakeZoneCircle(p, "RivT",  c + new Vector2(  0f, -6f), 5f, armor, o);
+        MakeZoneCircle(p, "RivL",  c + new Vector2(-18f,-18f), 5f, armor, o);
+        MakeZoneCircle(p, "RivR",  c + new Vector2( 18f,-18f), 5f, armor, o);
+        MakeZoneCircle(p, "RivB",  c + new Vector2(  0f,-30f), 5f, armor, o);
+
+        // Shoulder pads
+        MakeZoneCircle(p, "ShoulderL", c + new Vector2(-40f,-8f), 26f, armor, o);
+        MakeZoneCircle(p, "ShoulderR", c + new Vector2( 40f,-8f), 26f, armor, o);
+
+        // ── Shield arm (left) ─────────────────────────────────────────────────
+        MakeZoneRect(p, "ArmL",        c + new Vector2(-52f,-28f), new Vector2(20f,42f), -12f, gGrn);
+        // Shield body (wood panels)
+        MakeZoneRect(p, "ShldBody",    c + new Vector2(-92f,-26f), new Vector2(50f,62f),   0f, wood);
+        MakeZoneRect(p, "ShldPanL",    c + new Vector2(-104f,-26f), new Vector2(22f,58f),  0f, wdDk);
+        MakeZoneRect(p, "ShldPanR",    c + new Vector2( -80f,-26f), new Vector2(22f,58f),  0f, new Color(0.58f,0.35f,0.12f));
+        // Shield metal border
+        MakeZoneRect(p, "ShldBdTop",   c + new Vector2(-92f,  4f), new Vector2(50f, 7f),   0f, armor);
+        MakeZoneRect(p, "ShldBdBot",   c + new Vector2(-92f,-56f), new Vector2(50f, 7f),   0f, armor);
+        MakeZoneRect(p, "ShldBdMid",   c + new Vector2(-92f,-26f), new Vector2( 7f,62f),   0f, armor);
+        // Shield boss (centre metal knob)
+        MakeZoneCircle(p, "ShldBoss",  c + new Vector2(-92f,-26f), 16f, arDk,  o);
+        MakeZoneCircle(p, "ShldShine", c + new Vector2(-92f,-26f),  8f, armor,  o);
+
+        // ── Axe arm (right) ───────────────────────────────────────────────────
+        MakeZoneRect(p, "ArmR",      c + new Vector2(52f,-28f), new Vector2(20f,42f),  12f, gGrn);
+        // Axe handle
+        MakeZoneRect(p, "AxeHndl",   c + new Vector2(82f,-26f), new Vector2(10f,66f),  22f, wood);
+        MakeZoneRect(p, "AxeWrap1",  c + new Vector2(80f,-14f), new Vector2(14f, 6f),  22f, wdDk);
+        MakeZoneRect(p, "AxeWrap2",  c + new Vector2(86f,-30f), new Vector2(14f, 6f),  22f, wdDk);
+        // Axe blade (large crescent approximated with overlapping circles)
+        MakeZoneCircle(p, "AxeBlade",  c + new Vector2(102f, -4f), 46f, armor, o);
+        MakeZoneCircle(p, "AxeEdge",   c + new Vector2(108f,  2f), 30f, new Color(0.80f,0.82f,0.88f), o);
+        MakeZoneCircle(p, "AxeShine",  c + new Vector2(113f,  7f), 14f, new Color(1f,1f,1f,0.60f), o);
+        // Axe back spike
+        MakeZoneRect(p, "AxeSpike",  c + new Vector2(92f, 16f), new Vector2(6f,20f), -28f, arDk);
+
+        // ── Head ──────────────────────────────────────────────────────────────
+        MakeZoneCircle(p, "GatorHead", c + new Vector2(0f, 34f), 60f, gGrn, o);
+        // Dorsal ridges / spines
+        MakeZoneRect(p, "Spine1", c + new Vector2(-8f,62f), new Vector2(8f,15f),  10f, gDrk);
+        MakeZoneRect(p, "Spine2", c + new Vector2( 0f,66f), new Vector2(8f,17f),   0f, gDrk);
+        MakeZoneRect(p, "Spine3", c + new Vector2( 8f,62f), new Vector2(8f,15f), -10f, gDrk);
+
+        // Snout (upper + lower jaw)
+        MakeZoneRect(p, "UpperJaw", c + new Vector2(0f, 18f), new Vector2(60f,22f),  0f, gGrn);
+        MakeZoneRect(p, "LowerJaw", c + new Vector2(0f,  6f), new Vector2(54f,16f),  0f, gDrk);
+        // Teeth
+        for (int t = 0; t < 6; t++)
+        {
+            float tx = Mathf.Lerp(-20f, 20f, t / 5f);
+            MakeZoneRect(p, $"Tooth{t}", c + new Vector2(tx, 10f), new Vector2(6f, 10f), 0f, Color.white);
+        }
+        // Nostril bumps
+        MakeZoneCircle(p, "NostL", c + new Vector2(-8f, 22f), 7f, gDrk, o);
+        MakeZoneCircle(p, "NostR", c + new Vector2( 8f, 22f), 7f, gDrk, o);
+
+        // Eyes (white + dark pupil + angry brow)
+        MakeZoneCircle(p, "EyeWL", c + new Vector2(-18f,44f), 14f, Color.white, o);
+        MakeZoneCircle(p, "EyeWR", c + new Vector2( 18f,44f), 14f, Color.white, o);
+        MakeZoneCircle(p, "PupilL",c + new Vector2(-16f,42f),  8f, new Color(0.06f,0.05f,0.04f), o);
+        MakeZoneCircle(p, "PupilR",c + new Vector2( 20f,42f),  8f, new Color(0.06f,0.05f,0.04f), o);
+        MakeZoneRect(p,  "BrowL",  c + new Vector2(-18f,52f), new Vector2(20f,5f),  22f, gDrk);
+        MakeZoneRect(p,  "BrowR",  c + new Vector2( 18f,52f), new Vector2(20f,5f), -22f, gDrk);
     }
 
     static void MakeZoneCircle(GameObject parent, string name, Vector2 pos,

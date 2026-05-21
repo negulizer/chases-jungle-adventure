@@ -10,8 +10,10 @@ public class PlayerToken
     public BoardSessionPlayer sessionPlayer;
     public int position;
     public Color color;
+    public string colorName;    // e.g. "Yellow"
+    public int playerNumber;    // 1-based
     public GameObject tokenObject;
 
-    /// <summary>Safe player name — falls back to colour name when running in the Unity Editor.</summary>
-    public string DisplayName => sessionPlayer != null ? sessionPlayer.name : color.ToString();
+    /// <summary>Always "Player N (Color)" — clear for kids.</summary>
+    public string DisplayName => $"Player {playerNumber} ({colorName})";
 }

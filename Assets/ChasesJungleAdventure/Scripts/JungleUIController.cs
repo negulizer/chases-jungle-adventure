@@ -163,7 +163,7 @@ public class JungleUIController : MonoBehaviour
     {
         winPanel.SetActive(true);
         if (winText != null)
-            winText.text = $"{winner.DisplayName} reached the Waterfall!\nYou win!";
+            winText.text = $"Player {winner.playerNumber} WINS!!\n{winner.colorName} reached the Waterfall!";
     }
 
     // ── Turn HUD ──────────────────────────────────────────────────────────────
@@ -171,7 +171,7 @@ public class JungleUIController : MonoBehaviour
     public void ShowPlayerTurn(PlayerToken player)
     {
         if (playerTurnText != null)
-            playerTurnText.text = $"{player.DisplayName}'s turn!";
+            playerTurnText.text = $"Player {player.playerNumber}'s Turn!  ({player.colorName})";
         if (cardDrawnText != null)
             cardDrawnText.text = "";
     }

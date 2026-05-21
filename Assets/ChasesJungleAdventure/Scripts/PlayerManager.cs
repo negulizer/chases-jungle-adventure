@@ -9,7 +9,15 @@ public class PlayerManager : MonoBehaviour
 {
     public GameObject tokenPrefab;
     public Transform tokenParent;
-    public Color[] playerColors = new Color[] { Color.red, Color.blue, Color.green, Color.yellow };
+    public Color[] playerColors = new Color[]
+    {
+        new Color(1.00f, 0.92f, 0.04f),  // Yellow
+        new Color(0.72f, 0.08f, 1.00f),  // Purple
+        new Color(1.00f, 0.48f, 0.02f),  // Orange
+        new Color(1.00f, 0.38f, 0.70f),  // Pink
+    };
+
+    private static readonly string[] ColorNames = { "Yellow", "Purple", "Orange", "Pink" };
 
     private List<PlayerToken> players = new List<PlayerToken>();
 
@@ -35,17 +43,29 @@ public class PlayerManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var tokenObj = Instantiate(tokenPrefab, tokenParent);
-            // Person token: color the "Shirt" child; fall back to root Image for old prefabs.
+            // Color the Shirt child; fall back to root Image for legacy prefabs.
             var shirtT = tokenObj.transform.Find("Shirt");
             var img = (shirtT != null ? shirtT.GetComponent<UnityEngine.UI.Image>() : null)
                       ?? tokenObj.GetComponent<UnityEngine.UI.Image>();
-            if (img != null) img.color = playerColors[i % playerColors.Length];
+            Color col  = playerColors[i % playerColors.Length];
+            string cName = ColorNames[i % ColorNames.Length];
+            if (img != null) img.color = col;
+
+            // Update the number label on the token figure.
+            var markT = tokenObj.transform.Find("Mark");
+            if (markT != null)
+            {
+                var markTMP = markT.GetComponent<TMPro.TextMeshProUGUI>();
+                if (markTMP != null) markTMP.text = $"{i + 1}";
+            }
 
             players.Add(new PlayerToken
             {
-                sessionPlayer = sessionPlayers?[i],   // null in editor — DisplayName handles it
+                sessionPlayer = sessionPlayers?[i],
                 position      = 0,
-                color         = playerColors[i % playerColors.Length],
+                color         = col,
+                colorName     = cName,
+                playerNumber  = i + 1,
                 tokenObject   = tokenObj
             });
         }
