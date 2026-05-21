@@ -35,7 +35,10 @@ public class PlayerManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var tokenObj = Instantiate(tokenPrefab, tokenParent);
-            var img = tokenObj.GetComponent<UnityEngine.UI.Image>();
+            // Person token: color the "Shirt" child; fall back to root Image for old prefabs.
+            var shirtT = tokenObj.transform.Find("Shirt");
+            var img = (shirtT != null ? shirtT.GetComponent<UnityEngine.UI.Image>() : null)
+                      ?? tokenObj.GetComponent<UnityEngine.UI.Image>();
             if (img != null) img.color = playerColors[i % playerColors.Length];
 
             players.Add(new PlayerToken

@@ -21,25 +21,25 @@ using TMPro;
 
 public static class JungleSceneBuilder
 {
-    // ── Space colors: Red, Blue, Green, Yellow, Purple, Orange ───────────────
+    // ── Space colors: vivid Candy Land palette ─────────────────────────────
     static readonly Color[] SpaceColors =
     {
-        new Color(0.95f, 0.25f, 0.25f),
-        new Color(0.25f, 0.45f, 1.00f),
-        new Color(0.15f, 0.80f, 0.20f),
-        new Color(1.00f, 0.88f, 0.10f),
-        new Color(0.65f, 0.15f, 0.95f),
-        new Color(1.00f, 0.58f, 0.10f),
+        new Color(1.00f, 0.15f, 0.15f),  // vivid red
+        new Color(0.08f, 0.44f, 1.00f),  // bright blue
+        new Color(0.04f, 0.90f, 0.20f),  // vivid green
+        new Color(1.00f, 0.92f, 0.00f),  // bright yellow
+        new Color(0.72f, 0.08f, 1.00f),  // vivid purple
+        new Color(1.00f, 0.50f, 0.02f),  // bright orange
     };
 
-    static readonly Color PathShadowColor     = new Color(0.18f, 0.10f, 0.02f, 0.32f);
-    static readonly Color PathBaseColor       = new Color(0.78f, 0.58f, 0.20f, 0.96f);
-    static readonly Color PathHighlightColor  = new Color(0.95f, 0.84f, 0.48f, 0.92f);
-    static readonly Color PanelJungleTint     = new Color(0.06f, 0.28f, 0.12f);
-    static readonly Color LeafDarkColor       = new Color(0.08f, 0.31f, 0.12f, 0.90f);
-    static readonly Color LeafLightColor      = new Color(0.20f, 0.50f, 0.18f, 0.75f);
-    static readonly Color MistColor           = new Color(1f, 1f, 1f, 0.08f);
-    static readonly Color WaterfallColor      = new Color(0.52f, 0.86f, 1.00f, 0.50f);
+    static readonly Color PathShadowColor     = new Color(0.30f, 0.18f, 0.04f, 0.42f);
+    static readonly Color PathBaseColor       = new Color(0.97f, 0.93f, 0.76f, 1.00f);
+    static readonly Color PathHighlightColor  = new Color(1.00f, 0.99f, 0.92f, 0.62f);
+    static readonly Color PanelJungleTint     = new Color(0.04f, 0.40f, 0.10f);
+    static readonly Color LeafDarkColor       = new Color(0.05f, 0.50f, 0.12f, 0.96f);
+    static readonly Color LeafLightColor      = new Color(0.14f, 0.72f, 0.18f, 0.90f);
+    static readonly Color MistColor           = new Color(1f, 1f, 1f, 0.13f);
+    static readonly Color WaterfallColor      = new Color(0.28f, 0.82f, 1.00f, 0.70f);
 
     // ── Find a user script type without a hard compile-time reference ────────
     // This means the scene builder compiles even before the game scripts exist.
@@ -242,18 +242,30 @@ public static class JungleSceneBuilder
             float t   = col / 9f;
             float x   = (row % 2 == 0) ? Mathf.Lerp(xMin, xMax, t)
                                         : Mathf.Lerp(xMax, xMin, t);
-            spacePts[i] = new Vector2(x, yStart + row * yStep);
+            // Sine arc gives each row a gentle natural curve (peaks at mid-row)
+            float wave = Mathf.Sin(t * Mathf.PI) * 26f;
+            spacePts[i] = new Vector2(x, yStart + row * yStep + wave);
         }
 
-        // Board trail — single cream ribbon, Candy Land style
+        // Zone-themed area decorations — rendered behind the path and spaces
+        AddZoneDecorations(boardSpacesGO, spacePts, circleSprite);
+
+        // Board trail — three-layer ribbon: shadow + cream base + highlight
         for (int i = 0; i < 59; i++)
         {
             var dir = spacePts[i + 1] - spacePts[i];
             float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             Vector2 center = (spacePts[i] + spacePts[i + 1]) * 0.5f;
-            float connLen = Mathf.Max(0f, dir.magnitude - 62f);
-            MakeTrailSegment(boardSpacesGO, $"Trail_{i:D2}", center, connLen, 56f, angle,
-                new Color(0.94f, 0.90f, 0.74f, 1f));
+            float connLen = Mathf.Max(0f, dir.magnitude - 60f);
+            // Shadow (slightly wider and darker)
+            MakeTrailSegment(boardSpacesGO, $"TrailShadow_{i:D2}", center, connLen + 6f, 80f, angle,
+                PathShadowColor);
+            // Main cream ribbon
+            MakeTrailSegment(boardSpacesGO, $"Trail_{i:D2}", center, connLen, 68f, angle,
+                PathBaseColor);
+            // Centre highlight for depth
+            MakeTrailSegment(boardSpacesGO, $"TrailHL_{i:D2}", center, connLen, 22f, angle,
+                PathHighlightColor);
         }
 
         // Circular turn pads at row-end positions so corners look rounded
@@ -396,50 +408,140 @@ public static class JungleSceneBuilder
         EnsureFolder("Assets/ChasesJungleAdventure");
         var tokenGO = new GameObject("PlayerToken");
         var trt     = tokenGO.AddComponent<RectTransform>();
-        trt.sizeDelta = new Vector2(54, 54);
+        trt.sizeDelta = new Vector2(52f, 76f);   // taller than wide — person shape
+
+        // ── Shadow at bottom ──────────────────────────────────────────────────
         var tokenShadow = new GameObject("Shadow");
         tokenShadow.transform.SetParent(tokenGO.transform, false);
-        var tokenShadowRT = tokenShadow.AddComponent<RectTransform>();
-        tokenShadowRT.anchorMin = Vector2.zero;
-        tokenShadowRT.anchorMax = Vector2.one;
-        tokenShadowRT.offsetMin = new Vector2(5f, -5f);
-        tokenShadowRT.offsetMax = new Vector2(5f, -5f);
-        tokenShadow.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.22f);
+        var shadowRT = tokenShadow.AddComponent<RectTransform>();
+        shadowRT.anchorMin = new Vector2(0.12f, 0f);
+        shadowRT.anchorMax = new Vector2(0.88f, 0.09f);
+        shadowRT.offsetMin = shadowRT.offsetMax = Vector2.zero;
+        var shadowImg = tokenShadow.AddComponent<Image>();
+        shadowImg.color = new Color(0f, 0f, 0f, 0.28f);
+        if (circleSprite != null) shadowImg.sprite = circleSprite;
 
-        var tokenRing = tokenGO.AddComponent<Image>();
-        tokenRing.color = new Color(0.23f, 0.15f, 0.05f, 1f);
+        // ── Left leg ──────────────────────────────────────────────────────────
+        var legL = new GameObject("LegL");
+        legL.transform.SetParent(tokenGO.transform, false);
+        var llRT = legL.AddComponent<RectTransform>();
+        llRT.anchorMin = new Vector2(0.18f, 0.06f);
+        llRT.anchorMax = new Vector2(0.44f, 0.38f);
+        llRT.offsetMin = llRT.offsetMax = Vector2.zero;
+        legL.AddComponent<Image>().color = new Color(0.22f, 0.22f, 0.68f);  // blue trousers
 
-        var tokenFace = new GameObject("Face");
-        tokenFace.transform.SetParent(tokenGO.transform, false);
-        var tokenFaceRT = tokenFace.AddComponent<RectTransform>();
-        tokenFaceRT.anchorMin = new Vector2(0.14f, 0.14f);
-        tokenFaceRT.anchorMax = new Vector2(0.86f, 0.86f);
-        tokenFaceRT.offsetMin = tokenFaceRT.offsetMax = Vector2.zero;
-        tokenFace.AddComponent<Image>().color = Color.white;
+        // ── Right leg ─────────────────────────────────────────────────────────
+        var legR = new GameObject("LegR");
+        legR.transform.SetParent(tokenGO.transform, false);
+        var lrRT = legR.AddComponent<RectTransform>();
+        lrRT.anchorMin = new Vector2(0.56f, 0.06f);
+        lrRT.anchorMax = new Vector2(0.82f, 0.38f);
+        lrRT.offsetMin = lrRT.offsetMax = Vector2.zero;
+        legR.AddComponent<Image>().color = new Color(0.22f, 0.22f, 0.68f);  // blue trousers
 
-        var tokenShine = new GameObject("Shine");
-        tokenShine.transform.SetParent(tokenFace.transform, false);
-        var tokenShineRT = tokenShine.AddComponent<RectTransform>();
-        tokenShineRT.anchorMin = new Vector2(0.16f, 0.56f);
-        tokenShineRT.anchorMax = new Vector2(0.84f, 0.84f);
-        tokenShineRT.offsetMin = tokenShineRT.offsetMax = Vector2.zero;
-        tokenShineRT.localRotation = Quaternion.Euler(0, 0, -10f);
-        tokenShine.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.28f);
+        // ── Left arm ──────────────────────────────────────────────────────────
+        var armL = new GameObject("ArmL");
+        armL.transform.SetParent(tokenGO.transform, false);
+        var alRT = armL.AddComponent<RectTransform>();
+        alRT.anchorMin = new Vector2(0.00f, 0.38f);
+        alRT.anchorMax = new Vector2(0.22f, 0.64f);
+        alRT.offsetMin = alRT.offsetMax = Vector2.zero;
+        armL.AddComponent<Image>().color = new Color(0.96f, 0.80f, 0.62f);  // skin
 
+        // ── Right arm ─────────────────────────────────────────────────────────
+        var armR = new GameObject("ArmR");
+        armR.transform.SetParent(tokenGO.transform, false);
+        var arRT = armR.AddComponent<RectTransform>();
+        arRT.anchorMin = new Vector2(0.78f, 0.38f);
+        arRT.anchorMax = new Vector2(1.00f, 0.64f);
+        arRT.offsetMin = arRT.offsetMax = Vector2.zero;
+        armR.AddComponent<Image>().color = new Color(0.96f, 0.80f, 0.62f);  // skin
+
+        // ── Shirt / body — PlayerManager sets this child's color at runtime ──
+        var tokenShirt = new GameObject("Shirt");
+        tokenShirt.transform.SetParent(tokenGO.transform, false);
+        var shirtRT = tokenShirt.AddComponent<RectTransform>();
+        shirtRT.anchorMin = new Vector2(0.18f, 0.36f);
+        shirtRT.anchorMax = new Vector2(0.82f, 0.68f);
+        shirtRT.offsetMin = shirtRT.offsetMax = Vector2.zero;
+        var shirtImg = tokenShirt.AddComponent<Image>();
+        shirtImg.color = Color.red;  // default; overwritten at runtime per player
+        // Subtle white outline for readability against any board colour
+        var shirtOutline = new GameObject("Outline");
+        shirtOutline.transform.SetParent(tokenShirt.transform, false);
+        var soRT = shirtOutline.AddComponent<RectTransform>();
+        soRT.anchorMin = new Vector2(-0.10f, -0.10f);
+        soRT.anchorMax = new Vector2(1.10f, 1.10f);
+        soRT.offsetMin = soRT.offsetMax = Vector2.zero;
+        shirtOutline.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.35f);
+        shirtOutline.transform.SetAsFirstSibling();
+
+        // ── Head ──────────────────────────────────────────────────────────────
+        var tokenHead = new GameObject("Head");
+        tokenHead.transform.SetParent(tokenGO.transform, false);
+        var headRT = tokenHead.AddComponent<RectTransform>();
+        headRT.anchorMin = new Vector2(0.26f, 0.66f);
+        headRT.anchorMax = new Vector2(0.74f, 1.00f);
+        headRT.offsetMin = headRT.offsetMax = Vector2.zero;
+        var headImg = tokenHead.AddComponent<Image>();
+        headImg.color = new Color(0.98f, 0.82f, 0.62f);  // skin
+        if (circleSprite != null) headImg.sprite = circleSprite;
+
+        // Hair band across top of head
+        var hair = new GameObject("Hair");
+        hair.transform.SetParent(tokenHead.transform, false);
+        var hairRT = hair.AddComponent<RectTransform>();
+        hairRT.anchorMin = new Vector2(0.08f, 0.70f);
+        hairRT.anchorMax = new Vector2(0.92f, 1.00f);
+        hairRT.offsetMin = hairRT.offsetMax = Vector2.zero;
+        hair.AddComponent<Image>().color = new Color(0.28f, 0.16f, 0.05f);  // brown hair
+
+        // Left eye
+        var eyeL = new GameObject("EyeL");
+        eyeL.transform.SetParent(tokenHead.transform, false);
+        var elRT = eyeL.AddComponent<RectTransform>();
+        elRT.anchorMin = new Vector2(0.20f, 0.40f);
+        elRT.anchorMax = new Vector2(0.40f, 0.62f);
+        elRT.offsetMin = elRT.offsetMax = Vector2.zero;
+        var elImg = eyeL.AddComponent<Image>();
+        elImg.color = new Color(0.10f, 0.08f, 0.04f);
+        if (circleSprite != null) elImg.sprite = circleSprite;
+
+        // Right eye
+        var eyeR = new GameObject("EyeR");
+        eyeR.transform.SetParent(tokenHead.transform, false);
+        var erRT = eyeR.AddComponent<RectTransform>();
+        erRT.anchorMin = new Vector2(0.60f, 0.40f);
+        erRT.anchorMax = new Vector2(0.80f, 0.62f);
+        erRT.offsetMin = erRT.offsetMax = Vector2.zero;
+        var erImg = eyeR.AddComponent<Image>();
+        erImg.color = new Color(0.10f, 0.08f, 0.04f);
+        if (circleSprite != null) erImg.sprite = circleSprite;
+
+        // Smile
+        var smile = new GameObject("Smile");
+        smile.transform.SetParent(tokenHead.transform, false);
+        var smRT = smile.AddComponent<RectTransform>();
+        smRT.anchorMin = new Vector2(0.26f, 0.16f);
+        smRT.anchorMax = new Vector2(0.74f, 0.34f);
+        smRT.offsetMin = smRT.offsetMax = Vector2.zero;
+        smile.AddComponent<Image>().color = new Color(0.78f, 0.30f, 0.18f);
+
+        // Player number — small text on shirt
         var tokenMark = new GameObject("Mark");
         tokenMark.transform.SetParent(tokenGO.transform, false);
         var tokenMarkRT = tokenMark.AddComponent<RectTransform>();
-        tokenMarkRT.anchorMin = new Vector2(0.24f, 0.24f);
-        tokenMarkRT.anchorMax = new Vector2(0.76f, 0.76f);
+        tokenMarkRT.anchorMin = new Vector2(0.22f, 0.36f);
+        tokenMarkRT.anchorMax = new Vector2(0.78f, 0.66f);
         tokenMarkRT.offsetMin = tokenMarkRT.offsetMax = Vector2.zero;
         var tokenMarkTMP = tokenMark.AddComponent<TextMeshProUGUI>();
-        tokenMarkTMP.text = "!";
-        tokenMarkTMP.fontSize = 28f;
+        tokenMarkTMP.text = "1";
+        tokenMarkTMP.fontSize = 20f;
         tokenMarkTMP.fontStyle = FontStyles.Bold;
-        tokenMarkTMP.color = new Color(0.16f, 0.10f, 0.02f, 0.90f);
+        tokenMarkTMP.color = new Color(1f, 1f, 1f, 0.90f);
         tokenMarkTMP.alignment = TextAlignmentOptions.Center;
 
-        string       pfPath     = "Assets/ChasesJungleAdventure/PlayerToken.prefab";
+        string       pfPath      = "Assets/ChasesJungleAdventure/PlayerToken.prefab";
         var          tokenPrefab = PrefabUtility.SaveAsPrefabAsset(tokenGO, pfPath);
         Object.DestroyImmediate(tokenGO);
         AssetDatabase.Refresh();
@@ -552,18 +654,43 @@ public static class JungleSceneBuilder
 
     static void DecorateBoardBackground(GameObject boardPanel)
     {
-        MakeStretch(boardPanel, "SkyBand", new Vector2(0f, 0.55f), new Vector2(1f, 1f), new Color(0.34f, 0.67f, 0.92f));
-        MakeStretch(boardPanel, "CanopyBack", new Vector2(0f, 0.45f), new Vector2(1f, 0.78f), new Color(0.18f, 0.48f, 0.18f, 0.95f));
-        MakeStretch(boardPanel, "GroundBand", new Vector2(0f, 0f), new Vector2(1f, 0.44f), new Color(0.21f, 0.42f, 0.12f, 1f));
-        MakeStretch(boardPanel, "MistBand", new Vector2(0f, 0.40f), new Vector2(1f, 0.58f), MistColor);
+        // Vivid sky — bright tropical blue
+        MakeStretch(boardPanel, "SkyBand",   new Vector2(0f, 0.48f), new Vector2(1f, 1f), new Color(0.16f, 0.60f, 1.00f));
+        MakeStretch(boardPanel, "SkyGlow",   new Vector2(0f, 0.70f), new Vector2(1f, 1f), new Color(0.55f, 0.88f, 1.00f, 0.50f));
 
-        MakeLeafCluster(boardPanel, "LeafClusterLeftTop", new Vector2(0.10f, 0.88f), 260f, LeafDarkColor, -20f);
-        MakeLeafCluster(boardPanel, "LeafClusterRightTop", new Vector2(0.87f, 0.86f), 300f, LeafLightColor, 18f);
-        MakeLeafCluster(boardPanel, "LeafClusterLeftBottom", new Vector2(0.08f, 0.16f), 280f, LeafLightColor, 22f);
-        MakeLeafCluster(boardPanel, "LeafClusterRightBottom", new Vector2(0.90f, 0.18f), 300f, LeafDarkColor, -18f);
+        // Bright jungle floor
+        MakeStretch(boardPanel, "GroundBand", new Vector2(0f, 0f), new Vector2(1f, 0.52f), new Color(0.08f, 0.60f, 0.10f));
+        MakeStretch(boardPanel, "GroundMid",  new Vector2(0f, 0.28f), new Vector2(1f, 0.52f), new Color(0.06f, 0.50f, 0.08f, 0.75f));
 
-        MakeRibbon(boardPanel, "RiverRibbon", new Vector2(0.79f, 0.47f), new Vector2(480f, 120f), -18f, new Color(0.22f, 0.70f, 0.95f, 0.60f));
-        MakeRibbon(boardPanel, "WaterfallGlow", new Vector2(0.93f, 0.71f), new Vector2(180f, 420f), 0f, WaterfallColor);
+        // Canopy mid-band
+        MakeStretch(boardPanel, "CanopyBack", new Vector2(0f, 0.44f), new Vector2(1f, 0.74f), new Color(0.06f, 0.56f, 0.12f, 0.88f));
+        MakeStretch(boardPanel, "MistBand",   new Vector2(0f, 0.41f), new Vector2(1f, 0.57f), MistColor);
+
+        // Sun — bright yellow circle in upper-right sky
+        MakeRibbon(boardPanel, "SunBody",  new Vector2(0.83f, 0.91f), new Vector2(108f, 108f), 0f, new Color(1.00f, 0.94f, 0.08f, 0.96f));
+        MakeRibbon(boardPanel, "SunHalo",  new Vector2(0.83f, 0.91f), new Vector2(160f, 160f), 0f, new Color(1.00f, 0.92f, 0.30f, 0.22f));
+        MakeRibbon(boardPanel, "SunRay1",  new Vector2(0.83f, 0.91f), new Vector2(230f, 14f),  15f, new Color(1.00f, 0.96f, 0.30f, 0.25f));
+        MakeRibbon(boardPanel, "SunRay2",  new Vector2(0.83f, 0.91f), new Vector2(230f, 14f),  60f, new Color(1.00f, 0.96f, 0.30f, 0.25f));
+        MakeRibbon(boardPanel, "SunRay3",  new Vector2(0.83f, 0.91f), new Vector2(230f, 14f), 105f, new Color(1.00f, 0.96f, 0.30f, 0.25f));
+        MakeRibbon(boardPanel, "SunRay4",  new Vector2(0.83f, 0.91f), new Vector2(230f, 14f), 150f, new Color(1.00f, 0.96f, 0.30f, 0.25f));
+
+        // Dense leaf clusters around all four corners + sides
+        MakeLeafCluster(boardPanel, "LeafTL1",  new Vector2(0.03f, 0.92f), 320f, LeafDarkColor,  -15f);
+        MakeLeafCluster(boardPanel, "LeafTL2",  new Vector2(0.11f, 0.84f), 210f, LeafLightColor,  12f);
+        MakeLeafCluster(boardPanel, "LeafTR1",  new Vector2(0.96f, 0.90f), 300f, LeafLightColor,  24f);
+        MakeLeafCluster(boardPanel, "LeafTR2",  new Vector2(0.86f, 0.82f), 190f, LeafDarkColor,  -12f);
+        MakeLeafCluster(boardPanel, "LeafBL1",  new Vector2(0.03f, 0.08f), 310f, LeafLightColor,  22f);
+        MakeLeafCluster(boardPanel, "LeafBL2",  new Vector2(0.13f, 0.17f), 190f, LeafDarkColor,  -26f);
+        MakeLeafCluster(boardPanel, "LeafBR1",  new Vector2(0.97f, 0.10f), 310f, LeafDarkColor,  -22f);
+        MakeLeafCluster(boardPanel, "LeafBR2",  new Vector2(0.86f, 0.19f), 195f, LeafLightColor,  18f);
+        MakeLeafCluster(boardPanel, "LeafML",   new Vector2(0.01f, 0.50f), 210f, LeafDarkColor,    5f);
+        MakeLeafCluster(boardPanel, "LeafMR",   new Vector2(0.99f, 0.52f), 220f, LeafLightColor,  -5f);
+
+        // River + waterfall (right side)
+        MakeRibbon(boardPanel, "RiverRibbon1",  new Vector2(0.83f, 0.50f), new Vector2(530f, 94f),  -24f, new Color(0.08f, 0.50f, 1.00f, 0.52f));
+        MakeRibbon(boardPanel, "RiverRibbon2",  new Vector2(0.88f, 0.54f), new Vector2(310f, 62f),  -16f, new Color(0.38f, 0.78f, 1.00f, 0.32f));
+        MakeRibbon(boardPanel, "WaterfallGlow", new Vector2(0.95f, 0.72f), new Vector2(150f, 370f),   2f, WaterfallColor);
+        MakeRibbon(boardPanel, "WaterfallShine",new Vector2(0.95f, 0.72f), new Vector2( 52f, 370f),   0f, new Color(0.85f, 0.97f, 1.00f, 0.40f));
     }
 
     static GameObject MakeRoundedPlate(GameObject parent, string name, Vector2 anchor, Vector2 size, Color color, float angle)
@@ -656,10 +783,106 @@ public static class JungleSceneBuilder
         var rt = go.AddComponent<RectTransform>();
         rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
         rt.anchoredPosition = center;
-        rt.sizeDelta = new Vector2(88f, 88f);
+        rt.sizeDelta = new Vector2(92f, 92f);
         var img = go.AddComponent<Image>();
-        img.color = new Color(0.94f, 0.90f, 0.74f, 1f);
+        img.color = PathBaseColor;
         if (circle != null) img.sprite = circle;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //   ZONE DECORATION METHODS
+    // ════════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Draws themed environment art behind the board path for each special zone.
+    /// All elements are added to a single "ZoneDecorations" child that is set as
+    /// the first sibling so it renders below everything else.
+    /// </summary>
+    static void AddZoneDecorations(GameObject boardSpaces, Vector2[] pts, Sprite circle)
+    {
+        var z = new GameObject("ZoneDecorations");
+        z.transform.SetParent(boardSpaces.transform, false);
+        var zRT = z.AddComponent<RectTransform>();
+        zRT.anchorMin = zRT.anchorMax = new Vector2(0.5f, 0.5f);
+        zRT.sizeDelta = Vector2.zero;
+        zRT.anchoredPosition = Vector2.zero;
+        z.transform.SetAsFirstSibling();  // render behind trail and spaces
+
+        // ── Spider Swamp (space 7) — dark purple web ─────────────────────────
+        MakeZoneCircle(z, "SpiderSwampBg", pts[7], 210f, new Color(0.10f, 0.04f, 0.22f, 0.58f), circle);
+        MakeZoneCircle(z, "WebRing1",      pts[7],  88f, new Color(0.58f, 0.55f, 0.72f, 0.28f), circle);
+        MakeZoneCircle(z, "WebRing2",      pts[7], 148f, new Color(0.58f, 0.55f, 0.72f, 0.18f), circle);
+        for (int i = 0; i < 8; i++)
+            MakeZoneRect(z, $"WebStrand{i}", pts[7], new Vector2(185f, 3f), i * 22.5f,
+                new Color(0.58f, 0.55f, 0.72f, 0.36f));
+
+        // ── Swamp / grass around Snake (space 15) ────────────────────────────
+        MakeZoneCircle(z, "SnakeSwampBg", pts[15], 185f, new Color(0.06f, 0.32f, 0.06f, 0.50f), circle);
+        for (int i = 0; i < 9; i++)
+        {
+            float gx  = Mathf.Lerp(-80f, 80f, i / 8f);
+            float gh  = 26f + (i % 3) * 10f;
+            MakeZoneRect(z, $"Grass{i}", pts[15] + new Vector2(gx, gh * 0.38f),
+                new Vector2(5f, gh), -10f + i * 5.5f, new Color(0.10f, 0.75f, 0.12f, 0.80f));
+        }
+
+        // ── Monkey Canopy (space 22) — dark-green with hanging vines ─────────
+        MakeZoneCircle(z, "CanopyBg", pts[22], 220f, new Color(0.04f, 0.44f, 0.06f, 0.54f), circle);
+        for (int v = 0; v < 8; v++)
+        {
+            float vx  = Mathf.Lerp(-90f, 90f, v / 7f);
+            float vLen = 48f + (v % 2 == 0 ? 22f : 0f);
+            // Vine stem
+            MakeZoneRect(z, $"Vine{v}",      pts[22] + new Vector2(vx,  vLen * 0.32f),
+                new Vector2(5f, vLen), (v % 3 - 1) * 7f, new Color(0.14f, 0.64f, 0.10f, 0.84f));
+            // Leaf at vine tip
+            MakeZoneCircle(z, $"VineLeaf{v}", pts[22] + new Vector2(vx, -vLen * 0.10f),
+                16f, new Color(0.08f, 0.82f, 0.12f, 0.90f), circle);
+        }
+
+        // ── River band connecting alligator → raft (spaces 33–41) ────────────
+        for (int s = 33; s <= 41 && s < pts.Length; s++)
+            MakeZoneCircle(z, $"RiverPool{s}", pts[s], 82f,
+                new Color(0.06f, 0.40f, 0.92f, 0.38f), circle);
+
+        if (40 < pts.Length)
+        {
+            Vector2 mid   = (pts[35] + pts[40]) * 0.5f;
+            float   dist  = (pts[40] - pts[35]).magnitude;
+            float   ang   = Mathf.Atan2(pts[40].y - pts[35].y,
+                                        pts[40].x - pts[35].x) * Mathf.Rad2Deg;
+            MakeZoneRect(z, "RiverBand",  mid, new Vector2(dist + 55f, 88f), ang,
+                new Color(0.06f, 0.40f, 0.92f, 0.44f));
+            MakeZoneRect(z, "RiverShine", mid, new Vector2(dist + 55f, 30f), ang,
+                new Color(0.40f, 0.78f, 1.00f, 0.28f));
+        }
+    }
+
+    static void MakeZoneCircle(GameObject parent, string name, Vector2 pos,
+                                float size, Color color, Sprite circle)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent.transform, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = pos;
+        rt.sizeDelta        = new Vector2(size, size);
+        var img = go.AddComponent<Image>();
+        img.color  = color;
+        if (circle != null) img.sprite = circle;
+    }
+
+    static void MakeZoneRect(GameObject parent, string name, Vector2 pos,
+                              Vector2 size, float angle, Color color)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent.transform, false);
+        var rt = go.AddComponent<RectTransform>();
+        rt.anchorMin     = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = pos;
+        rt.sizeDelta        = size;
+        rt.localRotation    = Quaternion.Euler(0f, 0f, angle);
+        go.AddComponent<Image>().color = color;
     }
 
     /// <summary>Creates and saves a circle sprite to disk so it persists in the scene.</summary>
