@@ -176,17 +176,28 @@ public class JungleUIController : MonoBehaviour
             cardDrawnText.text = "";
     }
 
-    /// <param name="steps">How many spaces the token will travel — shown so kids know what to count to.</param>
-    public void ShowDrawnCard(CardSystem.Card card, int steps)
+    /// <param name="signedSteps">Positive = moving forward, negative = moving backward.</param>
+    /// <param name="linkedDestIndex">For special cards: the board index the linked effect ends on (-1 = none).</param>
+    public void ShowDrawnCard(CardSystem.Card card, int signedSteps, int linkedDestIndex = -1)
     {
-        string moveText = $"Moving {steps} space{(steps == 1 ? "" : "s")}!";
+        int abs = Mathf.Abs(signedSteps);
+        string moveText = signedSteps > 0
+            ? $"Forward {abs} space{(abs == 1 ? "" : "s")}!"
+            : signedSteps < 0
+                ? $"Back {abs} space{(abs == 1 ? "" : "s")}!"
+                : "Stay in place!";
 
         if (card.kind == CardSystem.CardKind.Special)
         {
             ShowSpecialCardIcon(card.specialType);
 
             if (cardDrawnText != null)
-                cardDrawnText.text = $"{SpecialTypeToName(card.specialType)} card! {moveText}";
+            {
+                string destLine = linkedDestIndex >= 0
+                    ? $"\nThen → space {linkedDestIndex + 1}!"
+                    : "";
+                cardDrawnText.text = $"{SpecialTypeToName(card.specialType)}!  {moveText}{destLine}";
+            }
         }
         else
         {

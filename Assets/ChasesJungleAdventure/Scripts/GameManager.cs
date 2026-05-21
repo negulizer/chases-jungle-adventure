@@ -142,12 +142,16 @@ public class GameManager : MonoBehaviour
 
             var card = cardSystem.DrawCard();
             int targetIndex;
+            int linkedDest = -1;   // final destination after any linked effect (-1 = none)
 
             if (card.kind == CardSystem.CardKind.Special)
             {
-                // Character card: move directly to that board space.
+                // Character card: always go to that space, forward OR backward.
                 int specialIndex = jungleBoard.GetSpecialSpaceIndex(card.specialType);
                 targetIndex = specialIndex >= 0 ? specialIndex : player.position;
+                // Preview the linked effect destination so the card message can show it.
+                if (specialIndex >= 0)
+                    linkedDest = jungleBoard.specialSpaces[specialIndex].linkedIndex;
             }
             else
             {
@@ -155,10 +159,10 @@ public class GameManager : MonoBehaviour
                 targetIndex = Mathf.Clamp(player.position + stepsToColor, 0, jungleBoard.GoalIndex);
             }
 
-            int steps = Mathf.Abs(targetIndex - player.position);
-            uiController.ShowDrawnCard(card, steps);
+            // Signed: positive = forward, negative = backward — used by the UI.
+            int signedSteps = targetIndex - player.position;
+            uiController.ShowDrawnCard(card, signedSteps, linkedDest);
             yield return new WaitForSeconds(1.0f);
-
 
             yield return MovePlayerToIndex(player, targetIndex);
             uiController.HideCountingDisplay();
@@ -166,9 +170,8 @@ public class GameManager : MonoBehaviour
             // Require physical piece placement on the correct space before ending turn
             yield return uiController.WaitForPieceOnSpace(player.position);
 
-            // Only resolve board special effects after normal color movement.
-            if (card.kind == CardSystem.CardKind.Color &&
-                jungleBoard.IsSpecialSpace(player.position, out var special))
+            // Apply linked space effect for ANY landing — color card OR character card.
+            if (jungleBoard.IsSpecialSpace(player.position, out var special))
                 yield return HandleSpecialSpace(player, special);
 
             if (player.position >= jungleBoard.GoalIndex)
