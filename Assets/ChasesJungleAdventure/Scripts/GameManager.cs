@@ -46,10 +46,10 @@ public class GameManager : MonoBehaviour
 
     private async void Start()
     {
-        const bool HasNoKnownSaveAtStartup = false;
+        const bool hasNoKnownSaveAtStartup = false;
 
         // Show the welcome UI immediately so startup never blocks on save metadata lookup.
-        uiController.ShowWelcomePanel(HasNoKnownSaveAtStartup);
+        uiController.ShowWelcomePanel(hasNoKnownSaveAtStartup);
         uiController.OnNewGame      += StartPlayerSetup;
         uiController.OnContinueGame += LoadAndContinue;
 
