@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">Orange Explorer Token</title>
+  <desc id="desc">Energetic kid explorer standing on an orange jungle token base.</desc>
+  <defs>
+    <filter id="base-shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#8E3E00" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <g id="orange-token">
+    <ellipse id="orange-base-shadow" cx="100" cy="162" rx="56" ry="16" fill="#8E3E00" opacity="0.28"/>
+    <g id="orange-base" filter="url(#base-shadow)">
+      <ellipse cx="100" cy="152" rx="58" ry="18" fill="#BE5800" stroke="#3B1B00" stroke-width="4"/>
+      <ellipse cx="100" cy="146" rx="56" ry="16" fill="#FF8D2A" stroke="#3B1B00" stroke-width="4"/>
+      <ellipse cx="88" cy="141" rx="24" ry="7" fill="#FFD1A5" opacity="0.7"/>
+    </g>
+    <g id="orange-explorer" stroke="#381800" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse id="legs" cx="100" cy="134" rx="17" ry="16" fill="#2F9E7A"/>
+      <rect id="shirt" x="82" y="103" width="36" height="34" rx="12" fill="#FFA94C"/>
+      <circle id="head" cx="100" cy="82" r="28" fill="#FFD0AD"/>
+      <path id="hair" d="M76 84c5-17 16-26 31-26s24 8 25 25c-7-3-13-4-25-4s-23 2-31 5z" fill="#C75D1A"/>
+      <g id="hat">
+        <ellipse cx="100" cy="62" rx="31" ry="10" fill="#E5C077"/>
+        <rect x="85" y="44" width="30" height="18" rx="8" fill="#F1D18B"/>
+      </g>
+      <circle id="left-eye" cx="91" cy="83" r="5" fill="#FFFFFF"/>
+      <circle id="right-eye" cx="109" cy="83" r="5" fill="#FFFFFF"/>
+      <circle cx="91" cy="84" r="2" fill="#381800" stroke="none"/>
+      <circle cx="109" cy="84" r="2" fill="#381800" stroke="none"/>
+      <path id="smile" d="M91 95c5 5 13 5 18 0" fill="none"/>
+      <circle id="left-cheek" cx="84" cy="92" r="4" fill="#F78989" stroke="none" opacity="0.8"/>
+      <circle id="right-cheek" cx="116" cy="92" r="4" fill="#F78989" stroke="none" opacity="0.8"/>
+      <path id="left-arm" d="M82 114l-13 8" fill="none"/>
+      <path id="right-arm" d="M118 114l13 5" fill="none"/>
+      <path id="left-leg" d="M93 136l-6 11" fill="none"/>
+      <path id="right-leg" d="M107 136l6 11" fill="none"/>
+      <path id="adventure-scarf" d="M95 108c5 3 10 3 15 0" fill="none"/>
+    </g>
+  </g>
+</svg>
