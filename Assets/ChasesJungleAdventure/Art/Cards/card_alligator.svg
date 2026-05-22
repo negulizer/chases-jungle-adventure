@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f9f4f"/>
+      <stop offset="1" stop-color="#145a2e"/>
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="8" y="8" width="184" height="264" rx="24" fill="url(#bg)"/>
+    <rect x="16" y="16" width="168" height="248" rx="20" fill="none" stroke="#78dd7f"/>
+
+    <path d="M22 40c16-2 20-14 30-22 4 12 10 16 20 20-10 6-14 12-16 22-8-8-16-12-34-20z" fill="#56c56a"/>
+    <path d="M178 40c-16-2-20-14-30-22-4 12-10 16-20 20 10 6 14 12 16 22 8-8 16-12 34-20z" fill="#56c56a"/>
+    <path d="M22 228c16 2 20 14 30 22 4-12 10-16 20-20-10-6-14-12-16-22-8 8-16 12-34 20z" fill="#56c56a"/>
+    <path d="M178 228c-16 2-20 14-30 22-4-12-10-16-20-20 10-6 14-12 16-22 8 8 16 12 34 20z" fill="#56c56a"/>
+
+    <g transform="translate(34 56) scale(0.52)" filter="url(#s)">
+      <ellipse cx="128" cy="210" rx="62" ry="14" fill="#000" opacity="0.18" stroke="none"/>
+      <path d="M72 158c0-36 26-64 58-64s58 28 58 64v20H72z" fill="#3bc55c"/>
+      <ellipse cx="128" cy="166" rx="34" ry="42" fill="#8de88e"/>
+      <path d="M70 166c-14-6-22-16-22-30 0-16 10-26 24-28 8-1 14 0 24 4" fill="#36b851"/>
+      <path d="M186 166c14-6 22-16 22-30 0-16-10-26-24-28-8-1-14 0-24 4" fill="#36b851"/>
+      <ellipse cx="92" cy="128" rx="18" ry="22" fill="#3bc55c"/>
+      <ellipse cx="164" cy="128" rx="18" ry="22" fill="#3bc55c"/>
+      <ellipse cx="92" cy="126" rx="10" ry="13" fill="#ffef6d"/>
+      <ellipse cx="164" cy="126" rx="10" ry="13" fill="#ffef6d"/>
+      <circle cx="95" cy="128" r="4" fill="#111"/>
+      <circle cx="161" cy="128" r="4" fill="#111"/>
+      <path d="M94 188c8 10 20 16 34 16s26-6 34-16" fill="#fff"/>
+      <path d="M98 188h60"/>
+      <path d="M106 188v10M120 188v11M136 188v11M150 188v10"/>
+    </g>
+
+    <path d="M30 74l6-12 6 12 12 6-12 6-6 12-6-12-12-6z" fill="#fff" stroke-width="3"/>
+    <path d="M170 82l4-8 4 8 8 4-8 4-4 8-4-8-8-4z" fill="#fff" stroke-width="3"/>
+    <path d="M154 172l4-8 4 8 8 4-8 4-4 8-4-8-8-4z" fill="#fff" stroke-width="3"/>
+
+    <text x="100" y="248" text-anchor="middle" font-size="28" font-weight="900" font-family="Verdana, Arial, sans-serif" fill="#ffe96c" stroke="#111" stroke-width="2">Alligator!</text>
+  </g>
+</svg>
