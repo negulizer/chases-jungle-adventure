@@ -1,22 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
   <g stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <ellipse cx="128" cy="210" rx="62" ry="14" fill="#000" opacity="0.18" stroke="none"/>
-    <path d="M72 158c0-36 26-64 58-64s58 28 58 64v20H72z" fill="#3bc55c"/>
-    <ellipse cx="128" cy="166" rx="34" ry="42" fill="#8de88e"/>
-    <path d="M70 166c-14-6-22-16-22-30 0-16 10-26 24-28 8-1 14 0 24 4" fill="#36b851"/>
-    <path d="M186 166c14-6 22-16 22-30 0-16-10-26-24-28-8-1-14 0-24 4" fill="#36b851"/>
-    <ellipse cx="92" cy="128" rx="18" ry="22" fill="#3bc55c"/>
-    <ellipse cx="164" cy="128" rx="18" ry="22" fill="#3bc55c"/>
-    <ellipse cx="92" cy="126" rx="10" ry="13" fill="#ffef6d"/>
-    <ellipse cx="164" cy="126" rx="10" ry="13" fill="#ffef6d"/>
-    <circle cx="95" cy="128" r="4" fill="#111"/>
-    <circle cx="161" cy="128" r="4" fill="#111"/>
-    <path d="M94 188c8 10 20 16 34 16s26-6 34-16" fill="#fff"/>
-    <path d="M98 188h60"/>
-    <path d="M106 188v10M120 188v11M136 188v11M150 188v10"/>
-    <path d="M88 206l-16 20M168 206l16 20" fill="none"/>
-    <path d="M102 96c8-10 18-14 26-14" fill="none"/>
-    <ellipse cx="111" cy="95" rx="9" ry="5" fill="#fff" stroke="none" opacity="0.45"/>
-    <ellipse cx="151" cy="104" rx="11" ry="6" fill="#fff" stroke="none" opacity="0.35"/>
+    <ellipse cx="128" cy="212" rx="84" ry="16" fill="#000" opacity="0.18" stroke="none"/>
+
+    <!-- tail -->
+    <path d="M70 166c-20-6-32-16-36-29 16-2 32 0 45 8" fill="#2ea84c"/>
+    <path d="M62 154l-16-8M54 162l-14-2" fill="none"/>
+
+    <!-- body -->
+    <ellipse cx="132" cy="160" rx="68" ry="40" fill="#39bf56"/>
+    <ellipse cx="132" cy="170" rx="42" ry="24" fill="#9be98f"/>
+
+    <!-- back scutes -->
+    <path d="M90 128l8-12 8 12M108 122l8-12 8 12M126 120l8-12 8 12M144 122l8-12 8 12M162 128l8-12 8 12" fill="#2c9f46"/>
+
+    <!-- head and snout -->
+    <ellipse cx="192" cy="146" rx="34" ry="28" fill="#39bf56"/>
+    <path d="M202 138c20 0 34 6 40 14-7 8-22 14-40 14-10 0-17-2-24-6v-16c7-4 14-6 24-6z" fill="#39bf56"/>
+    <path d="M201 152h40"/>
+    <path d="M200 152c8 9 16 14 26 14 8 0 14-2 15-5" fill="#fff"/>
+    <path d="M206 153v9M216 153v11M227 153v9"/>
+
+    <!-- nostrils -->
+    <circle cx="236" cy="147" r="2.5" fill="#111"/>
+    <circle cx="236" cy="157" r="2.5" fill="#111"/>
+
+    <!-- eyes -->
+    <ellipse cx="180" cy="122" rx="12" ry="10" fill="#ffeb62"/>
+    <ellipse cx="199" cy="123" rx="12" ry="10" fill="#ffeb62"/>
+    <circle cx="181" cy="123" r="3" fill="#111"/>
+    <circle cx="200" cy="124" r="3" fill="#111"/>
+
+    <!-- legs -->
+    <path d="M104 192v20h18v-18" fill="#2ea84c"/>
+    <path d="M150 192v20h18v-18" fill="#2ea84c"/>
+    <path d="M86 186v18h16v-14" fill="#2ea84c"/>
+    <path d="M170 186v18h16v-14" fill="#2ea84c"/>
+
+    <!-- cheeks + shine -->
+    <ellipse cx="184" cy="140" rx="6" ry="4" fill="#ff9ca8"/>
+    <ellipse cx="151" cy="142" rx="10" ry="6" fill="#fff" opacity="0.35" stroke="none"/>
+    <ellipse cx="116" cy="154" rx="16" ry="8" fill="#fff" opacity="0.22" stroke="none"/>
   </g>
 </svg>
