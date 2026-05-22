@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f9f4f"/>
+      <stop offset="1" stop-color="#145a2e"/>
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="8" y="8" width="184" height="264" rx="24" fill="url(#bg)"/>
+    <rect x="16" y="16" width="168" height="248" rx="20" fill="none" stroke="#78dd7f"/>
+
+    <path d="M22 40c16-2 20-14 30-22 4 12 10 16 20 20-10 6-14 12-16 22-8-8-16-12-34-20z" fill="#56c56a"/>
+    <path d="M178 40c-16-2-20-14-30-22-4 12-10 16-20 20 10 6 14 12 16 22 8-8 16-12 34-20z" fill="#56c56a"/>
+    <path d="M22 228c16 2 20 14 30 22 4-12 10-16 20-20-10-6-14-12-16-22-8 8-16 12-34 20z" fill="#56c56a"/>
+    <path d="M178 228c-16 2-20 14-30 22-4-12-10-16-20-20 10-6 14-12 16-22 8 8 16 12 34 20z" fill="#56c56a"/>
+
+    <g transform="translate(15 66) scale(0.68)" filter="url(#s)">
+      <ellipse cx="128" cy="212" rx="84" ry="16" fill="#000" opacity="0.18" stroke="none"/>
+      <path d="M70 166c-20-6-32-16-36-29 16-2 32 0 45 8" fill="#2ea84c"/>
+      <path d="M62 154l-16-8M54 162l-14-2" fill="none"/>
+      <ellipse cx="132" cy="160" rx="68" ry="40" fill="#39bf56"/>
+      <ellipse cx="132" cy="170" rx="42" ry="24" fill="#9be98f"/>
+      <path d="M90 128l8-12 8 12M108 122l8-12 8 12M126 120l8-12 8 12M144 122l8-12 8 12M162 128l8-12 8 12" fill="#2c9f46"/>
+      <ellipse cx="192" cy="146" rx="34" ry="28" fill="#39bf56"/>
+      <path d="M202 138c20 0 34 6 40 14-7 8-22 14-40 14-10 0-17-2-24-6v-16c7-4 14-6 24-6z" fill="#39bf56"/>
+      <path d="M201 152h40"/>
+      <path d="M200 152c8 9 16 14 26 14 8 0 14-2 15-5" fill="#fff"/>
+      <path d="M206 153v9M216 153v11M227 153v9"/>
+      <circle cx="236" cy="147" r="2.5" fill="#111"/>
+      <circle cx="236" cy="157" r="2.5" fill="#111"/>
+      <ellipse cx="180" cy="122" rx="12" ry="10" fill="#ffeb62"/>
+      <ellipse cx="199" cy="123" rx="12" ry="10" fill="#ffeb62"/>
+      <circle cx="181" cy="123" r="3" fill="#111"/>
+      <circle cx="200" cy="124" r="3" fill="#111"/>
+      <path d="M104 192v20h18v-18" fill="#2ea84c"/>
+      <path d="M150 192v20h18v-18" fill="#2ea84c"/>
+      <path d="M86 186v18h16v-14" fill="#2ea84c"/>
+      <path d="M170 186v18h16v-14" fill="#2ea84c"/>
+      <ellipse cx="184" cy="140" rx="6" ry="4" fill="#ff9ca8"/>
+      <ellipse cx="151" cy="142" rx="10" ry="6" fill="#fff" opacity="0.35" stroke="none"/>
+      <ellipse cx="116" cy="154" rx="16" ry="8" fill="#fff" opacity="0.22" stroke="none"/>
+    </g>
+
+    <path d="M30 74l6-12 6 12 12 6-12 6-6 12-6-12-12-6z" fill="#fff" stroke-width="3"/>
+    <path d="M170 82l4-8 4 8 8 4-8 4-4 8-4-8-8-4z" fill="#fff" stroke-width="3"/>
+    <path d="M154 172l4-8 4 8 8 4-8 4-4 8-4-8-8-4z" fill="#fff" stroke-width="3"/>
+
+    <text x="100" y="248" text-anchor="middle" font-size="28" font-weight="900" font-family="Verdana, Arial, sans-serif" fill="#ffe96c" stroke="#111" stroke-width="2">Alligator!</text>
+  </g>
+</svg>
